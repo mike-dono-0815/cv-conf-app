@@ -1,38 +1,61 @@
 'use client'
 
 import { Html } from '@react-three/drei'
+import { useMemo } from 'react'
+import * as THREE from 'three'
 
-const FLOOR_MAT = { color: '#c8cdd8', roughness: 0.9, metalness: 0 }
 const WALL_MAT = { color: '#e8eaef', roughness: 0.95, metalness: 0 }
 const CEILING_MAT = { color: '#d0d4de', roughness: 0.9, metalness: 0 }
 const PILLAR_MAT = { color: '#1a2b4a', roughness: 0.6, metalness: 0.1 }
 
-// Carpet zones
-const POSTER_CARPET = { color: '#dce8ff', roughness: 0.9, metalness: 0 }
-const ORAL_CARPET = { color: '#ffdede', roughness: 0.9, metalness: 0 }
-const FAIR_CARPET = { color: '#fff3dc', roughness: 0.9, metalness: 0 }
+// Classic conference-carpet checkerboard: deep burgundy + deep navy
+const CHECKER_A = '#6b1220'
+const CHECKER_B = '#1a2b4a'
+
+// Pillar z positions — shared between pillars and wall fill segments
+const PILLAR_Z = [-18, -10, -2, 6, 14] as const
+
+// Wall fill segments: centered between each consecutive pair of pillars,
+// length = gap between pillar centres minus one pillar width (0.6)
+const WALL_FILLS = PILLAR_Z.slice(0, -1).map((z, i) => ({
+  centerZ: (z + PILLAR_Z[i + 1]) / 2,
+  length: Math.abs(PILLAR_Z[i + 1] - z) - 0.6,
+}))
+
+function useCheckerTexture() {
+  return useMemo(() => {
+    // 2×2 pixel canvas — one checker cell per pixel, tiled by Three.js
+    const canvas = document.createElement('canvas')
+    canvas.width = 2
+    canvas.height = 2
+    const ctx = canvas.getContext('2d')!
+    ctx.fillStyle = CHECKER_A
+    ctx.fillRect(0, 0, 1, 1)
+    ctx.fillRect(1, 1, 1, 1)
+    ctx.fillStyle = CHECKER_B
+    ctx.fillRect(1, 0, 1, 1)
+    ctx.fillRect(0, 1, 1, 1)
+
+    const tex = new THREE.CanvasTexture(canvas)
+    tex.magFilter = THREE.NearestFilter
+    tex.minFilter = THREE.NearestFilter
+    tex.wrapS = THREE.RepeatWrapping
+    tex.wrapT = THREE.RepeatWrapping
+    // Floor is 60 × 40 world units; each square = 2 × 2 units → 30 × 20 repeats
+    tex.repeat.set(30, 20)
+    return tex
+  }, [])
+}
 
 export function HallStructure() {
+  const checkerTex = useCheckerTexture()
+
   return (
     <group>
-      {/* Main floor */}
+      {/* Checkerboard carpet floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
         <planeGeometry args={[60, 40]} />
-        <meshStandardMaterial {...FLOOR_MAT} />
-      </mesh>
-
-      {/* Zone carpets */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-18, 0.01, -5]}>
-        <planeGeometry args={[24, 30]} />
-        <meshStandardMaterial {...POSTER_CARPET} />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[1, 0.01, -5]}>
-        <planeGeometry args={[14, 30]} />
-        <meshStandardMaterial {...ORAL_CARPET} />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[19, 0.01, -5]}>
-        <planeGeometry args={[22, 30]} />
-        <meshStandardMaterial {...FAIR_CARPET} />
+        <meshStandardMaterial map={checkerTex} roughness={0.85} metalness={0} />
       </mesh>
 
       {/* Ceiling */}
@@ -41,35 +64,39 @@ export function HallStructure() {
         <meshStandardMaterial {...CEILING_MAT} />
       </mesh>
 
-      {/* North wall */}
+      {/* Outer walls */}
       <mesh position={[0, 3.5, -20]}>
         <boxGeometry args={[60, 7, 0.3]} />
         <meshStandardMaterial {...WALL_MAT} />
       </mesh>
-
-      {/* South wall */}
       <mesh position={[0, 3.5, 20]}>
         <boxGeometry args={[60, 7, 0.3]} />
         <meshStandardMaterial {...WALL_MAT} />
       </mesh>
-
-      {/* East wall */}
       <mesh position={[30, 3.5, 0]}>
         <boxGeometry args={[0.3, 7, 40]} />
         <meshStandardMaterial {...WALL_MAT} />
       </mesh>
-
-      {/* West wall */}
       <mesh position={[-30, 3.5, 0]}>
         <boxGeometry args={[0.3, 7, 40]} />
         <meshStandardMaterial {...WALL_MAT} />
       </mesh>
 
       {/* Zone separator pillars */}
-      {[-7, 9].map((x) =>
-        [-18, -10, -2, 6, 14].map((z) => (
-          <mesh key={`${x}-${z}`} position={[x, 3.5, z]}>
+      {([-7, 9] as const).map((x) =>
+        PILLAR_Z.map((z) => (
+          <mesh key={`pillar-${x}-${z}`} position={[x, 3.5, z]}>
             <boxGeometry args={[0.6, 7, 0.6]} />
+            <meshStandardMaterial {...PILLAR_MAT} />
+          </mesh>
+        ))
+      )}
+
+      {/* Zone separator walls — fill between each pair of adjacent pillars */}
+      {([-7, 9] as const).map((x) =>
+        WALL_FILLS.map((seg) => (
+          <mesh key={`wall-${x}-${seg.centerZ}`} position={[x, 3.5, seg.centerZ]}>
+            <boxGeometry args={[0.6, 7, seg.length]} />
             <meshStandardMaterial {...PILLAR_MAT} />
           </mesh>
         ))
@@ -80,7 +107,7 @@ export function HallStructure() {
       <ZoneBanner position={[1, 5.5, -19.5]} text="ORAL PRESENTATIONS" color="#8b1a1a" />
       <ZoneBanner position={[19, 5.5, -19.5]} text="INDUSTRY FAIR" color="#663300" />
 
-      {/* CVPR 2026 banner above entrance */}
+      {/* CVPR 2026 entry banner */}
       <mesh position={[0, 6, 19.5]}>
         <boxGeometry args={[20, 1.2, 0.1]} />
         <meshStandardMaterial color="#c0392b" />
