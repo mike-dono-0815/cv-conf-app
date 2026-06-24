@@ -1,0 +1,91 @@
+{
+  "posters": [
+    {
+      "id": "37999",
+      "title": "Do VLMs Perceive or Recall? Probing Visual Perception vs. Memory with Classic Visual Illusions",
+      "shortTitle": "Do VLMs Perceive or Recall?",
+      "authors": ["Xiaoxiao Sun", "Mingyang Li", "Kun Yuan", "Min Woo", "Mark Endo", "Shengguang Wu", "Changlin Li", "Yuhui Zhang", "Zeyu Wang", "Serena Yeung"],
+      "firstAuthor": "Xiaoxiao Sun",
+      "abstract": "This work examines whether Vision-Language Models (VLMs) truly perform visual perception or instead rely on memorized linguistic patterns. We introduce VI-Probe, a diagnostic framework that uses classic visual illusions with graded perturbations and matched controls to disentangle visually grounded perception from language-driven recall. Our analysis reveals distinct failure modes across model families: GPT-5 shows strong memory dominance — confidently recalling learned descriptions rather than perceiving the actual image. Claude-Opus-4.1 exhibits a perception-memory conflict, alternating between genuine visual cues and learned priors. Qwen variants suggest architectural visual-processing constraints. VI-Probe provides a principled benchmark for measuring the degree to which VLMs are 'seeing' vs. 'remembering'.",
+      "session": "Saturday, June 6, 2026 | 3:45 PM – 5:45 PM PDT | ExHall A & F 412",
+      "cvfUrl": "https://cvpr.thecvf.com/virtual/2026/poster/37999",
+      "pdfUrl": "https://openaccess.thecvf.com/content/CVPR2026/html/Sun_Do_VLMs_Perceive_or_Recall_Probing_Visual_Perception_vs._Memory_CVPR_2026_paper.html",
+      "accentColor": "#3b82f6"
+    },
+    {
+      "id": "38050",
+      "title": "TF-CADE: Foreground-Concentrated Text-Video Alignment for Zero-Shot Temporal Action Detection",
+      "shortTitle": "TF-CADE",
+      "authors": ["Yearang Lee", "Ho-Joong Kim", "Seong-Whan Lee"],
+      "firstAuthor": "Yearang Lee",
+      "abstract": "Zero-shot temporal action detection (TAD) in untrimmed videos requires aligning textual descriptions of action categories with relevant video regions — without any labeled examples at test time. We propose TF-CADE, a framework that strengthens this alignment by focusing on action-relevant foreground regions. Our key contributions are: (1) Action Concentrate Aggregation (ACA), which weights video segments by their temporal relevance to the action category, suppressing background noise; and (2) Certainty-based Confidence Re-weighting (CCR), which filters out ambiguous action predictions during inference. Experiments on ActivityNet-v1.3 and THUMOS14 demonstrate state-of-the-art zero-shot performance, with strong generalization to novel action categories from unseen datasets.",
+      "session": "Friday, June 5, 2026 | 9:45 AM – 11:45 AM PDT | ExHall A-F 262",
+      "cvfUrl": "https://cvpr.thecvf.com/virtual/2026/poster/38050",
+      "pdfUrl": "https://openaccess.thecvf.com/content/CVPR2026/html/Lee_TF-CADE_Foreground-Concentrated_Text-Video_Alignment_for_Zero-Shot_Temporal_Action_Detection_CVPR_2026_paper.html",
+      "accentColor": "#10b981",
+      "highlighted": true
+    },
+    {
+      "id": "38300",
+      "title": "Multimodal Semantic Bias Mitigation for Diverse Text-To-3D Generation",
+      "shortTitle": "Multimodal Bias in Text-to-3D",
+      "authors": ["Yukuan Min", "Muli Yang", "Jinhao Zhang", "Yuxuan Wang", "Yihang Zhu", "Jiexi Yan", "Cheng Deng"],
+      "firstAuthor": "Yukuan Min",
+      "abstract": "Text-to-3D generation models often produce outputs that are overly literal, prompt-sensitive, or semantically narrow — failing to capture the full diversity implied by a text description. We identify cross-modality semantic bias as a key culprit: misalignments between text and 3D representations that cause mode collapse. Our framework detects these biases by generating 3D content, evaluating output quality across semantic dimensions, and quantifying each text token's contribution to the bias. We then construct diverse paired training examples that explicitly strengthen visual-text grounding. The result is a text-to-3D system that produces higher-quality and more semantically varied 3D outputs, outperforming prior methods on both automated metrics and human evaluation.",
+      "session": "Saturday, June 6, 2026 | 10:45 AM – 12:45 PM PDT | ExHall F 50",
+      "cvfUrl": "https://cvpr.thecvf.com/virtual/2026/poster/38300",
+      "pdfUrl": "https://openaccess.thecvf.com/content/CVPR2026/html/Min_Multimodal_Semantic_Bias_Mitigation_for_Diverse_Text-To-3D_Generation_CVPR_2026_paper.html",
+      "accentColor": "#8b5cf6"
+    },
+    {
+      "id": "38400",
+      "title": "Probabilistic Concept Graph Reasoning for Multimodal Misinformation Detection",
+      "shortTitle": "PCGR: Misinformation Detection",
+      "authors": ["Ruichao Yang", "Wei Gao", "Xiaobin Zhu", "Jing Ma", "Hongzhan Lin", "Ziyang Luo", "Bo-Wen Zhang", "Xu-Cheng Yin"],
+      "firstAuthor": "Ruichao Yang",
+      "abstract": "Detecting multimodal misinformation — false claims supported by manipulated images and deceptive text — remains challenging because prior methods rely on opaque neural decisions without interpretable evidence chains. We introduce PCGR (Probabilistic Concept Graph Reasoning), a framework that constructs an interpretable graph of concept nodes representing claim components. High-level concepts beyond standard ontologies are discovered via multimodal large language models, and probabilistic edges encode evidential relationships. Claim veracity is determined by graph traversal, producing transparent reasoning paths from evidence to conclusion. PCGR outperforms black-box detectors on both standard benchmarks and emerging manipulation techniques, while providing human-readable explanations for each decision.",
+      "session": "Saturday, June 6, 2026 | 10:45 AM – 12:45 PM PDT | ExHall F 453",
+      "cvfUrl": "https://cvpr.thecvf.com/virtual/2026/poster/38400",
+      "pdfUrl": "https://openaccess.thecvf.com/content/CVPR2026/html/Yang_Probabilistic_Concept_Graph_Reasoning_for_Multimodal_Misinformation_Detection_CVPR_2026_paper.html",
+      "accentColor": "#f59e0b"
+    },
+    {
+      "id": "38700",
+      "title": "Audio-sync Video Instance Editing with Granularity-Aware Mask Refiner",
+      "shortTitle": "AVI-Edit: Audio-Sync Video Editing",
+      "authors": ["Haojie Zheng", "Shuchen Weng", "Jingqi Liu", "Siqi Yang", "Boxin Shi", "Xinlong Wang"],
+      "firstAuthor": "Haojie Zheng",
+      "abstract": "Current video editing methods overlook the synchronization between visual edits and the audio track, producing results where the modified visuals are temporally misaligned with sound. We introduce AVI-Edit, the first framework for audio-synchronized video instance editing. Our Granularity-Aware Mask Refiner converts coarse user-provided segmentation masks into precise, temporally-consistent instance-level regions across frames. An audio agent provides temporal control signals that guide when and how edits manifest, ensuring visual changes align with audio events. We also contribute a new benchmark dataset for audio-visual synchronized editing. AVI-Edit substantially outperforms baselines in visual quality, instruction following, and audio-visual synchronization metrics.",
+      "session": "Saturday, June 6, 2026 | 3:45 PM – 5:45 PM PDT | ExHall A & F 160",
+      "cvfUrl": "https://cvpr.thecvf.com/virtual/2026/poster/38700",
+      "pdfUrl": "https://openaccess.thecvf.com/content/CVPR2026/html/Zheng_Audio-sync_Video_Instance_Editing_with_Granularity-Aware_Mask_Refiner_CVPR_2026_paper.html",
+      "accentColor": "#ef4444"
+    }
+  ],
+  "oral": {
+    "id": "39000",
+    "title": "Lafite: A Generative Latent Field for 3D Native Texturing",
+    "shortTitle": "Lafite: 3D Native Texturing",
+    "authors": ["Chia-Hao Chen", "Yuanchen Guo", "Zi-Xin Zou", "Ze Yuan", "Guan Luo", "Xiaojuan Qi", "Ding Liang", "Yan-Pei Cao", "Song-Hai Zhang"],
+    "firstAuthor": "Chia-Hao Chen",
+    "abstract": "Texturing 3D objects is fundamentally constrained by the need for UV unwrapping or multi-view projection — both of which introduce seams, distortions, and limited generalization. Lafite approaches 3D texturing natively, learning a generative latent field defined directly in 3D space. We represent texture and geometry jointly using a local vector field with a structured latent code, enabling a model that understands the 3D structure rather than projecting 2D cues. The result is a texture generator that avoids seams entirely, handles complex topologies naturally, and supports downstream tasks including semantic editing and inpainting. Lafite achieves state-of-the-art on standard 3D texture benchmarks and was recognized as a CVPR 2026 Highlight paper.",
+    "session": "Saturday, June 6, 2026 | 10:45 AM – 12:45 PM PDT | ExHall F 533",
+    "cvfUrl": "https://cvpr.thecvf.com/virtual/2026/poster/39000",
+    "pdfUrl": "https://openaccess.thecvf.com/content/CVPR2026/html/Chen_Lafite_A_Generative_Latent_Field_for_3D_Native_Texturing_CVPR_2026_paper.html",
+    "highlighted": true
+  },
+  "booth": {
+    "company": "Amazon",
+    "team": "Amazon Rekognition & Computer Vision",
+    "recruiterName": "Alex Chen",
+    "logo": "AMAZON",
+    "tagline": "Building the future of computer vision at scale",
+    "description": "Amazon's computer vision teams power Rekognition (face analysis, object detection, scene understanding), Just Walk Out Technology in Amazon Go stores, Alexa Vision, and fulfillment center automation. We operate at a scale few companies can match — billions of images analyzed daily — and publish extensively at top venues including CVPR, ICCV, and NeurIPS.",
+    "openRoles": [
+      "Applied Scientist – Rekognition",
+      "Research Scientist – 3D Vision (Robotics)",
+      "Senior SDE – Computer Vision Platform",
+      "ML Engineer – Just Walk Out Technology"
+    ]
+  }
+}

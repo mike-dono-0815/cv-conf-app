@@ -1,0 +1,148 @@
+'use client'
+
+import { useRef, useEffect, MutableRefObject } from 'react'
+import { useThree, useFrame } from '@react-three/fiber'
+import { PointerLockControls } from '@react-three/drei'
+import * as THREE from 'three'
+import type { Interactable } from '@/lib/types'
+
+interface Props {
+  interactables: Interactable[]
+  onNearby: (label: string | null) => void
+  onInteract: (item: Interactable) => void
+  onZoneChange: (zone: string) => void
+  onLockChange: (locked: boolean) => void
+  controlsRef: MutableRefObject<{ unlock: () => void } | null>
+  disabled: boolean
+}
+
+const SPEED = 8
+const INTERACTION_RADIUS = 4
+const HALL_X = [-29, 29] as const
+const HALL_Z = [-19, 19] as const
+
+function getZone(x: number): string {
+  if (x < -6) return 'Poster Hall'
+  if (x > 8) return 'Industry Fair'
+  return 'Oral Theater'
+}
+
+export function FirstPersonPlayer({
+  interactables,
+  onNearby,
+  onInteract,
+  onZoneChange,
+  onLockChange,
+  controlsRef,
+  disabled,
+}: Props) {
+  const { camera } = useThree()
+  const keys = useRef({ w: false, a: false, s: false, d: false })
+  const nearbyRef = useRef<Interactable | null>(null)
+  const lockedRef = useRef(false)
+  const lastZone = useRef('')
+  const controls = useRef<any>(null)
+
+  useEffect(() => {
+    camera.position.set(0, 1.7, 18)
+    camera.lookAt(0, 1.7, 0)
+  }, [camera])
+
+  useEffect(() => {
+    if (controls.current) {
+      controlsRef.current = { unlock: () => controls.current?.unlock() }
+    }
+  })
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.code === 'KeyW') keys.current.w = true
+      if (e.code === 'KeyA') keys.current.a = true
+      if (e.code === 'KeyS') keys.current.s = true
+      if (e.code === 'KeyD') keys.current.d = true
+      if (e.code === 'KeyE' && !disabled && nearbyRef.current && lockedRef.current) {
+        onInteract(nearbyRef.current)
+      }
+    }
+    const up = (e: KeyboardEvent) => {
+      if (e.code === 'KeyW') keys.current.w = false
+      if (e.code === 'KeyA') keys.current.a = false
+      if (e.code === 'KeyS') keys.current.s = false
+      if (e.code === 'KeyD') keys.current.d = false
+    }
+    window.addEventListener('keydown', down)
+    window.addEventListener('keyup', up)
+    return () => {
+      window.removeEventListener('keydown', down)
+      window.removeEventListener('keyup', up)
+    }
+  }, [disabled, onInteract])
+
+  useFrame((_, delta) => {
+    if (!lockedRef.current || disabled) return
+
+    const forward = new THREE.Vector3()
+    camera.getWorldDirection(forward)
+    forward.y = 0
+    forward.normalize()
+
+    const right = new THREE.Vector3()
+    right.crossVectors(forward, new THREE.Vector3(0, 1, 0))
+
+    const move = new THREE.Vector3()
+    if (keys.current.w) move.addScaledVector(forward, 1)
+    if (keys.current.s) move.addScaledVector(forward, -1)
+    if (keys.current.a) move.addScaledVector(right, -1)
+    if (keys.current.d) move.addScaledVector(right, 1)
+
+    if (move.length() > 0) {
+      move.normalize().multiplyScalar(SPEED * delta)
+      camera.position.add(move)
+    }
+
+    camera.position.y = 1.7
+    camera.position.x = Math.max(HALL_X[0], Math.min(HALL_X[1], camera.position.x))
+    camera.position.z = Math.max(HALL_Z[0], Math.min(HALL_Z[1], camera.position.z))
+
+    // Zone detection
+    const zone = getZone(camera.position.x)
+    if (zone !== lastZone.current) {
+      lastZone.current = zone
+      onZoneChange(zone)
+    }
+
+    // Proximity to interactables
+    let closest: Interactable | null = null
+    let closestDist = INTERACTION_RADIUS
+
+    for (const item of interactables) {
+      const dx = camera.position.x - item.position[0]
+      const dz = camera.position.z - item.position[2]
+      const dist = Math.sqrt(dx * dx + dz * dz)
+      if (dist < closestDist) {
+        closest = item
+        closestDist = dist
+      }
+    }
+
+    if (closest !== nearbyRef.current) {
+      nearbyRef.current = closest
+      onNearby(closest?.label ?? null)
+    }
+  })
+
+  return (
+    <PointerLockControls
+      ref={controls}
+      onLock={() => {
+        lockedRef.current = true
+        onLockChange(true)
+      }}
+      onUnlock={() => {
+        lockedRef.current = false
+        onLockChange(false)
+        keys.current = { w: false, a: false, s: false, d: false }
+      }}
+    />
+  )
+}
