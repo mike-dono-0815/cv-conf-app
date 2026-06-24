@@ -39,18 +39,19 @@ export function IndustryFair({ booth }: Props) {
         </div>
       </Html>
 
-      {/* Tagline */}
-      <Html position={[20, 1.8, -17.5]} center transform scale={0.015}>
+      {/* Big banner quote on back wall */}
+      <Html position={[20, 2.0, -17.5]} center transform scale={0.026}>
         <div style={{
           fontFamily: 'system-ui, sans-serif',
-          color: '#adb5bd',
-          fontSize: '22px',
-          fontWeight: '400',
+          color: AMAZON_ORANGE,
+          fontSize: '28px',
+          fontWeight: '700',
           pointerEvents: 'none',
           textAlign: 'center',
-          maxWidth: '480px',
+          maxWidth: '500px',
+          lineHeight: '1.45',
         }}>
-          {booth.tagline}
+          &ldquo;Join us in pioneering solutions to complex challenges that not only delight our customers but also help define the future of technology.&rdquo;
         </div>
       </Html>
 

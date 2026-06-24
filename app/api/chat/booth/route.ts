@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 import conferenceData from '@/data/conference.json'
-
-export const runtime = 'edge'
 
 export async function POST(req: NextRequest) {
   const { messages } = await req.json()
@@ -11,6 +11,13 @@ export async function POST(req: NextRequest) {
 
   const { booth } = conferenceData
 
+  let amazonContext = ''
+  try {
+    amazonContext = readFileSync(join(process.cwd(), 'amazon_science_computer_vision.md'), 'utf-8')
+  } catch {
+    // file not found — proceed without it
+  }
+
   const systemPrompt = `You are ${booth.recruiterName}, a technical recruiter for ${booth.team} at Amazon, staffing the Amazon booth at CVPR 2026 in Nashville.
 
 About the team:
@@ -18,15 +25,10 @@ ${booth.description}
 
 Current open roles you're recruiting for:
 ${booth.openRoles.map(r => `- ${r}`).join('\n')}
+${amazonContext ? `\n## Additional context about Amazon's computer vision research and careers\n\n${amazonContext}` : ''}
+Be warm, enthusiastic, and informative. Answer questions about Amazon's CV research, products, team culture, and open roles using the context above. Talk about the interview process (behavioral + technical coding + system design) if asked.
 
-Be warm, enthusiastic, and informative. Talk about:
-- Amazon's world-scale computer vision research and products (Rekognition, Just Walk Out, Alexa Vision, fulfillment robotics)
-- The research culture and publishing at top venues (CVPR, ICCV, NeurIPS, ECCV)
-- What it's like to work at Amazon's CV teams
-- The open roles listed above
-- The interview process (behavioral + technical coding + system design)
-
-Do NOT make up specific salary numbers. Keep responses conversational, 1-3 paragraphs. Be genuinely interested in the candidate's background.`
+Keep responses conversational, 1-3 paragraphs. Be genuinely interested in the candidate's background.`
 
   const mistralRes = await fetch('https://api.mistral.ai/v1/chat/completions', {
     method: 'POST',

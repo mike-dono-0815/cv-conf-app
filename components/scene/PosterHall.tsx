@@ -1,6 +1,7 @@
 'use client'
 
-import { Html } from '@react-three/drei'
+import { useEffect, useRef, useState } from 'react'
+import * as THREE from 'three'
 import type { Paper } from '@/lib/types'
 
 interface Props {
@@ -17,17 +18,161 @@ const POSITIONS: [number, number, number][] = [
 ]
 
 const EASEL_COLOR = '#2c3e50'
-const BOARD_COLOR = '#ffffff'
+const CANVAS_W = 512
+const CANVAS_H = 709  // matches 2.6 : 3.6 aspect ratio
+
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const words = text.split(' ')
+  const lines: string[] = []
+  let current = ''
+  for (const word of words) {
+    const test = current ? `${current} ${word}` : word
+    if (ctx.measureText(test).width > maxWidth && current) {
+      lines.push(current)
+      current = word
+    } else {
+      current = test
+    }
+  }
+  if (current) lines.push(current)
+  return lines
+}
+
+function buildPosterCanvas(paper: Paper, logo: HTMLImageElement | null): HTMLCanvasElement {
+  const W = CANVAS_W
+  const H = CANVAS_H
+  const canvas = document.createElement('canvas')
+  canvas.width = W
+  canvas.height = H
+  const ctx = canvas.getContext('2d')!
+  const accent = paper.accentColor ?? '#1a2b4a'
+
+  // White background
+  ctx.fillStyle = '#f8f9fa'
+  ctx.fillRect(0, 0, W, H)
+
+  // ── Navy header ──
+  const headerH = 90
+  ctx.fillStyle = '#1a2b4a'
+  ctx.fillRect(0, 0, W, headerH)
+
+  // Right accent stripe
+  ctx.fillStyle = accent
+  ctx.fillRect(W - 14, 0, 14, headerH)
+
+  // CVPR logo (white SVG on navy)
+  if (logo && logo.naturalWidth > 0) {
+    const logoH = 50
+    const logoW = logoH * (logo.naturalWidth / logo.naturalHeight)
+    const clampedW = Math.min(logoW, 210)
+    ctx.drawImage(logo, 14, (headerH - logoH) / 2, clampedW, logoH)
+  } else {
+    // Text fallback
+    ctx.fillStyle = '#ffffff'
+    ctx.font = 'bold 36px Georgia, serif'
+    ctx.fillText('CVPR', 14, 52)
+  }
+
+  // Conference details (top-right of header)
+  ctx.fillStyle = 'rgba(255,255,255,0.55)'
+  ctx.font = '9px system-ui, sans-serif'
+  ctx.textAlign = 'right'
+  ctx.fillText('IEEE/CVF Conference on', W - 22, 26)
+  ctx.fillText('Computer Vision and', W - 22, 40)
+  ctx.fillText('Pattern Recognition', W - 22, 54)
+  ctx.fillText('Nashville, TN · June 2026', W - 22, 70)
+  ctx.textAlign = 'left'
+
+  let y = headerH + 10
+
+  // ── Highlight badge ──
+  if (paper.highlighted) {
+    ctx.fillStyle = '#f59e0b'
+    ctx.fillRect(0, y, W, 22)
+    ctx.fillStyle = '#000000'
+    ctx.font = 'bold 10px system-ui, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText('★  CVPR 2026 HIGHLIGHT PAPER', W / 2, y + 15)
+    ctx.textAlign = 'left'
+    y += 30
+  } else {
+    y += 6
+  }
+
+  // ── Paper title ──
+  ctx.fillStyle = '#0d1117'
+  ctx.font = 'bold 18px system-ui, sans-serif'
+  const titleLines = wrapText(ctx, paper.title, W - 32)
+  const titleLineH = 24
+  titleLines.forEach((line, i) => ctx.fillText(line, 16, y + titleLineH + i * titleLineH))
+  y += titleLineH + titleLines.length * titleLineH + 10
+
+  // ── Accent rule ──
+  ctx.strokeStyle = accent
+  ctx.lineWidth = 3
+  ctx.beginPath()
+  ctx.moveTo(16, y)
+  ctx.lineTo(W - 16, y)
+  ctx.stroke()
+  y += 12
+
+  // ── Authors ──
+  const authStr = paper.authors.length > 4
+    ? paper.authors.slice(0, 4).join(', ') + ' et al.'
+    : paper.authors.join(', ')
+  ctx.fillStyle = '#444444'
+  ctx.font = '12px system-ui, sans-serif'
+  const authLines = wrapText(ctx, authStr, W - 32)
+  authLines.forEach((line, i) => ctx.fillText(line, 16, y + 14 + i * 17))
+  y += 14 + authLines.length * 17 + 12
+
+  // ── Abstract label ──
+  ctx.fillStyle = accent
+  ctx.font = 'bold 10px system-ui, sans-serif'
+  ctx.fillText('A B S T R A C T', 16, y)
+  y += 14
+
+  // ── Abstract body ──
+  ctx.fillStyle = '#2a2a2a'
+  ctx.font = '11.5px system-ui, sans-serif'
+  const bottomBarH = 34
+  const absLines = wrapText(ctx, paper.abstract, W - 32)
+  const lineH = 15
+  const availH = H - bottomBarH - 4 - y
+  const maxLines = Math.min(absLines.length, Math.floor(availH / lineH))
+
+  absLines.slice(0, maxLines).forEach((line, i) => {
+    ctx.fillText(line, 16, y + lineH + i * lineH)
+  })
+  if (absLines.length > maxLines && maxLines > 0) {
+    // Overwrite last line with truncation indicator
+    ctx.fillStyle = '#f8f9fa'
+    ctx.fillRect(16, y + (maxLines - 1) * lineH + 2, W - 32, lineH + 2)
+    ctx.fillStyle = '#888888'
+    ctx.fillText(absLines[maxLines - 1].slice(0, -3) + '…', 16, y + lineH + (maxLines - 1) * lineH)
+  }
+
+  // ── Bottom accent bar ──
+  ctx.fillStyle = accent
+  ctx.fillRect(0, H - bottomBarH, W, bottomBarH)
+  ctx.fillStyle = 'rgba(255,255,255,0.9)'
+  ctx.font = '9.5px system-ui, sans-serif'
+  ctx.textAlign = 'center'
+  const sessionShort = paper.session.split('|')[0].trim()
+  ctx.fillText(sessionShort, W / 2, H - bottomBarH + 14)
+  ctx.font = 'bold 9px system-ui, sans-serif'
+  ctx.fillStyle = 'rgba(255,255,255,0.6)'
+  ctx.fillText(paper.session.split('|').slice(1).join(' | ').trim(), W / 2, H - bottomBarH + 26)
+  ctx.textAlign = 'left'
+
+  return canvas
+}
 
 export function PosterHall({ papers }: Props) {
   return (
     <group>
       {papers.map((paper, i) => (
-        <PosterBoard
-          key={paper.id}
-          paper={paper}
-          position={POSITIONS[i]}
-        />
+        <PosterBoard key={paper.id} paper={paper} position={POSITIONS[i]} />
       ))}
     </group>
   )
@@ -35,7 +180,32 @@ export function PosterHall({ papers }: Props) {
 
 function PosterBoard({ paper, position }: { paper: Paper; position: [number, number, number] }) {
   const [x, y, z] = position
-  const accent = paper.accentColor ?? '#1a2b4a'
+  const [posterTex, setPosterTex] = useState<THREE.CanvasTexture | null>(null)
+  const texRef = useRef<THREE.CanvasTexture | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+
+    const finish = (logo: HTMLImageElement | null) => {
+      if (cancelled) return
+      const canvas = buildPosterCanvas(paper, logo)
+      const tex = new THREE.CanvasTexture(canvas)
+      tex.needsUpdate = true
+      texRef.current?.dispose()
+      texRef.current = tex
+      setPosterTex(tex)
+    }
+
+    img.onload = () => finish(img)
+    img.onerror = () => finish(null)
+    img.src = '/cvpr-logo.svg'
+
+    return () => { cancelled = true }
+  }, [paper])
+
+  useEffect(() => () => { texRef.current?.dispose() }, [])
 
   return (
     <group position={[x, 0, z]}>
@@ -53,70 +223,16 @@ function PosterBoard({ paper, position }: { paper: Paper; position: [number, num
         <meshStandardMaterial color={EASEL_COLOR} />
       </mesh>
 
-      {/* Poster board background */}
+      {/* Poster board with canvas texture */}
       <mesh position={[0, y, 0]}>
         <boxGeometry args={[2.6, 3.6, 0.06]} />
-        <meshStandardMaterial color={BOARD_COLOR} />
+        <meshStandardMaterial
+          map={posterTex ?? undefined}
+          color="#ffffff"
+          roughness={0.9}
+          metalness={0}
+        />
       </mesh>
-
-      {/* Accent strip at top */}
-      <mesh position={[0, y + 1.6, 0.04]}>
-        <boxGeometry args={[2.6, 0.35, 0.02]} />
-        <meshStandardMaterial color={accent} />
-      </mesh>
-
-      {/* Highlight ribbon if applicable */}
-      {paper.highlighted && (
-        <mesh position={[0.95, y + 1.45, 0.06]}>
-          <boxGeometry args={[0.65, 0.2, 0.02]} />
-          <meshStandardMaterial color="#f59e0b" />
-        </mesh>
-      )}
-
-      {/* HTML content on board */}
-      <Html position={[0, y, 0.1]} center transform scale={0.018}>
-        <div
-          style={{
-            width: '140px',
-            height: '196px',
-            fontFamily: 'system-ui, sans-serif',
-            background: 'white',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '4px 6px 6px',
-            gap: '4px',
-            pointerEvents: 'none',
-            userSelect: 'none',
-          }}
-        >
-          {/* Title area */}
-          <div style={{ borderBottom: `2px solid ${accent}`, paddingBottom: '4px' }}>
-            {paper.highlighted && (
-              <div style={{ fontSize: '6px', color: '#f59e0b', fontWeight: 'bold', letterSpacing: '0.5px', marginBottom: '2px' }}>
-                ★ HIGHLIGHT
-              </div>
-            )}
-            <div style={{ fontSize: '8px', fontWeight: '700', color: '#111', lineHeight: '1.2' }}>
-              {paper.shortTitle}
-            </div>
-          </div>
-
-          {/* Authors */}
-          <div style={{ fontSize: '6px', color: '#555' }}>
-            {paper.authors.slice(0, 3).join(', ')}{paper.authors.length > 3 ? ' et al.' : ''}
-          </div>
-
-          {/* Abstract snippet */}
-          <div style={{ fontSize: '6px', color: '#333', lineHeight: '1.4', flex: 1, overflow: 'hidden' }}>
-            {paper.abstract.slice(0, 240)}…
-          </div>
-
-          {/* Session */}
-          <div style={{ fontSize: '5.5px', color: '#888', borderTop: '1px solid #eee', paddingTop: '3px' }}>
-            {paper.session.split('|')[0].trim()}
-          </div>
-        </div>
-      </Html>
     </group>
   )
 }
