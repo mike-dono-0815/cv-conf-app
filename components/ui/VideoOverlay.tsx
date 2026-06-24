@@ -130,47 +130,43 @@ export function VideoOverlay({ paper, onClose }: Props) {
         {phase === 'watching' ? (
           /* Watching phase */
           <div className="flex flex-col flex-1 overflow-y-auto">
-            {/* Simulated talk slide */}
-            <div className="bg-[#0d1535] mx-6 mt-6 rounded-xl p-8 flex flex-col items-center gap-4 border border-[#1a2550]">
-              <div className="text-[#f59e0b] text-xs font-bold tracking-widest">CVPR 2026 · ORAL PRESENTATION</div>
-              <h2 className="text-white text-xl font-bold text-center leading-snug max-w-xl">
-                {paper.title}
-              </h2>
-              <p className="text-slate-400 text-sm">
-                {paper.authors.join(', ')}
-              </p>
-              <div className="w-full h-px bg-white/10 my-2" />
-              <div className="grid grid-cols-3 gap-4 w-full text-center">
-                {['Motivation', 'Method', 'Results'].map(section => (
-                  <div key={section} className="bg-white/5 rounded-lg p-4 border border-white/5">
-                    <div className="text-slate-300 text-xs font-bold mb-2 uppercase tracking-wide">{section}</div>
-                    <div className="w-full h-12 bg-white/5 rounded" />
-                  </div>
-                ))}
-              </div>
+            {/* YouTube embed */}
+            <div className="relative w-full bg-black" style={{ paddingBottom: '56.25%' }}>
+              {paper.videoUrl ? (
+                <iframe
+                  src={paper.videoUrl}
+                  className="absolute inset-0 w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  title={paper.title}
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-[#0d1535]">
+                  <p className="text-slate-500 text-sm">No video available</p>
+                </div>
+              )}
             </div>
 
-            {/* Abstract */}
-            <div className="px-6 py-5">
-              <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Abstract</h3>
-              <p className="text-slate-300 text-sm leading-relaxed">{paper.abstract}</p>
+            {/* Paper meta + abstract */}
+            <div className="px-6 pt-4 pb-3">
+              <p className="text-slate-400 text-xs">{paper.authors.join(', ')}</p>
+              <p className="text-slate-600 text-xs mt-0.5">{paper.session}</p>
             </div>
-
-            {/* Session info */}
             <div className="px-6 pb-4">
-              <p className="text-slate-600 text-xs">{paper.session}</p>
+              <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">Abstract</h3>
+              <p className="text-slate-300 text-sm leading-relaxed">{paper.abstract}</p>
               <a
                 href={paper.pdfUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#c0392b] text-xs hover:underline mt-1 inline-block"
+                className="text-[#c0392b] text-xs hover:underline mt-2 inline-block"
               >
                 Read the paper →
               </a>
             </div>
 
             {/* Q&A button */}
-            <div className="px-6 pb-6 flex-shrink-0 border-t border-white/5 pt-4">
+            <div className="px-6 pb-6 pt-3 border-t border-white/5 flex-shrink-0">
               <button
                 onClick={startQA}
                 className="w-full py-3 rounded-xl bg-[#c0392b] hover:bg-[#a93226] text-white font-semibold transition-colors"

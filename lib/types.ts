@@ -10,6 +10,7 @@ export interface Paper {
   pdfUrl: string
   accentColor?: string
   highlighted?: boolean
+  videoUrl?: string
 }
 
 export interface BoothData {
