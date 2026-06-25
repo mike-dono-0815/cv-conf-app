@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import conferenceData from '@/data/conference.json'
 
+export const runtime = 'edge'
+
 export async function POST(req: NextRequest) {
   const { messages, paperId } = await req.json()
 
