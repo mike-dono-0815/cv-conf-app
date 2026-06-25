@@ -184,12 +184,8 @@ function PosterBoard({ paper, position }: { paper: Paper; position: [number, num
   const texRef = useRef<THREE.CanvasTexture | null>(null)
 
   useEffect(() => {
-    let cancelled = false
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-
-    const finish = (logo: HTMLImageElement | null) => {
-      if (cancelled) return
+    // Generate the poster immediately so boards are never blank
+    const applyCanvas = (logo: HTMLImageElement | null) => {
       const canvas = buildPosterCanvas(paper, logo)
       const tex = new THREE.CanvasTexture(canvas)
       tex.needsUpdate = true
@@ -198,8 +194,15 @@ function PosterBoard({ paper, position }: { paper: Paper; position: [number, num
       setPosterTex(tex)
     }
 
-    img.onload = () => finish(img)
-    img.onerror = () => finish(null)
+    applyCanvas(null)
+
+    // Upgrade with the actual logo if it loads with real dimensions
+    let cancelled = false
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      if (!cancelled && img.naturalWidth > 0) applyCanvas(img)
+    }
     img.src = '/cvpr-logo.svg'
 
     return () => { cancelled = true }
@@ -227,6 +230,7 @@ function PosterBoard({ paper, position }: { paper: Paper; position: [number, num
       <mesh position={[0, y, 0]}>
         <boxGeometry args={[2.6, 3.6, 0.06]} />
         <meshStandardMaterial
+          key={posterTex ? 'poster-tex' : 'poster-plain'}
           map={posterTex ?? undefined}
           color="#ffffff"
           roughness={0.9}
