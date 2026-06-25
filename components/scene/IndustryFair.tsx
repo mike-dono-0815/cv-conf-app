@@ -1,6 +1,7 @@
 'use client'
 
-import { Html } from '@react-three/drei'
+import { useMemo } from 'react'
+import * as THREE from 'three'
 import type { BoothData } from '@/lib/types'
 
 interface Props {
@@ -11,12 +12,96 @@ const AMAZON_ORANGE = '#ff9900'
 const AMAZON_DARK = '#232f3e'
 
 export function IndustryFair({ booth }: Props) {
+  const backWallTex = useMemo(() => {
+    const W = 1400, H = 600
+    const canvas = document.createElement('canvas')
+    canvas.width = W
+    canvas.height = H
+    const ctx = canvas.getContext('2d')!
+    ctx.fillStyle = AMAZON_DARK
+    ctx.fillRect(0, 0, W, H)
+    ctx.textAlign = 'center'
+    ctx.fillStyle = AMAZON_ORANGE
+    ctx.font = '900 150px system-ui, sans-serif'
+    ctx.fillText('amazon', W / 2, 210)
+    ctx.font = 'bold 36px system-ui, sans-serif'
+    const quote = '“Join us in pioneering solutions to complex challenges that not only delight our customers but also help define the future of technology.”'
+    const maxW = W - 120
+    let line = '', y = 310
+    for (const word of quote.split(' ')) {
+      const test = line ? `${line} ${word}` : word
+      if (ctx.measureText(test).width > maxW && line) { ctx.fillText(line, W / 2, y); line = word; y += 50 }
+      else { line = test }
+    }
+    if (line) ctx.fillText(line, W / 2, y)
+    const t = new THREE.CanvasTexture(canvas)
+    t.needsUpdate = true
+    return t
+  }, [])
+
+  const bannerTex = useMemo(() => {
+    const W = 300, H = 400
+    const canvas = document.createElement('canvas')
+    canvas.width = W
+    canvas.height = H
+    const ctx = canvas.getContext('2d')!
+    ctx.fillStyle = AMAZON_DARK
+    ctx.fillRect(0, 0, W, H)
+    ctx.textAlign = 'center'
+    ctx.fillStyle = AMAZON_ORANGE
+    ctx.font = 'bold 56px system-ui, sans-serif'
+    ctx.fillText('Amazon', W / 2, 130)
+    ctx.fillStyle = '#aaaaaa'
+    ctx.font = '34px system-ui, sans-serif'
+    ctx.fillText('Computer Vision &', W / 2, 220)
+    ctx.fillText('Rekognition', W / 2, 270)
+    const t = new THREE.CanvasTexture(canvas)
+    t.needsUpdate = true
+    return t
+  }, [])
+
+  const hiringTex = useMemo(() => {
+    const W = 500, H = 120
+    const canvas = document.createElement('canvas')
+    canvas.width = W
+    canvas.height = H
+    const ctx = canvas.getContext('2d')!
+    ctx.fillStyle = AMAZON_ORANGE
+    ctx.fillRect(0, 0, W, H)
+    ctx.fillStyle = '#ffffff'
+    ctx.font = 'bold 56px system-ui, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText("We're Hiring!", W / 2, H / 2)
+    const t = new THREE.CanvasTexture(canvas)
+    t.needsUpdate = true
+    return t
+  }, [])
+
+  const nameBadgeTex = useMemo(() => {
+    const W = 400, H = 100
+    const canvas = document.createElement('canvas')
+    canvas.width = W
+    canvas.height = H
+    const ctx = canvas.getContext('2d')!
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, W, H)
+    ctx.fillStyle = '#111111'
+    ctx.font = 'bold 52px system-ui, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(booth.recruiterName, W / 2, H / 2)
+    const t = new THREE.CanvasTexture(canvas)
+    t.needsUpdate = true
+    return t
+  }, [booth.recruiterName])
+
   return (
     <group>
       {/* Booth back wall */}
       <mesh position={[20, 3, -18]}>
         <boxGeometry args={[14, 6, 0.3]} />
-        <meshStandardMaterial color={AMAZON_DARK} />
+        <meshStandardMaterial map={backWallTex} />
       </mesh>
 
       {/* Orange top stripe */}
@@ -24,36 +109,6 @@ export function IndustryFair({ booth }: Props) {
         <boxGeometry args={[14, 0.8, 0.1]} />
         <meshStandardMaterial color={AMAZON_ORANGE} />
       </mesh>
-
-      {/* Amazon logo text on wall */}
-      <Html position={[20, 3.2, -17.5]} center transform scale={0.025}>
-        <div style={{
-          fontFamily: 'system-ui, sans-serif',
-          color: AMAZON_ORANGE,
-          fontSize: '40px',
-          fontWeight: '900',
-          letterSpacing: '-1px',
-          pointerEvents: 'none',
-        }}>
-          amazon
-        </div>
-      </Html>
-
-      {/* Big banner quote on back wall */}
-      <Html position={[20, 2.0, -17.5]} center transform scale={0.026}>
-        <div style={{
-          fontFamily: 'system-ui, sans-serif',
-          color: AMAZON_ORANGE,
-          fontSize: '28px',
-          fontWeight: '700',
-          pointerEvents: 'none',
-          textAlign: 'center',
-          maxWidth: '500px',
-          lineHeight: '1.45',
-        }}>
-          &ldquo;Join us in pioneering solutions to complex challenges that not only delight our customers but also help define the future of technology.&rdquo;
-        </div>
-      </Html>
 
       {/* Side panels */}
       <mesh position={[13.2, 3, -16]}>
@@ -86,21 +141,10 @@ export function IndustryFair({ booth }: Props) {
       </mesh>
 
       {/* Open role cards on counter */}
-      <Html position={[22, 1.1, -13.1]} center transform scale={0.01}>
-        <div style={{
-          fontFamily: 'system-ui, sans-serif',
-          color: 'white',
-          fontSize: '12px',
-          fontWeight: 'bold',
-          pointerEvents: 'none',
-          background: AMAZON_ORANGE,
-          padding: '4px 8px',
-          borderRadius: '4px',
-          whiteSpace: 'nowrap',
-        }}>
-          We&apos;re Hiring!
-        </div>
-      </Html>
+      <mesh position={[22, 1.1, -12.95]}>
+        <planeGeometry args={[2, 0.5]} />
+        <meshStandardMaterial map={hiringTex} />
+      </mesh>
 
       {/* Recruiter avatar */}
       <group position={[20, 0, -14.5]}>
@@ -124,11 +168,10 @@ export function IndustryFair({ booth }: Props) {
           <meshStandardMaterial color="#232f3e" />
         </mesh>
         {/* Name badge */}
-        <Html position={[0, 1.0, 0.12]} center transform scale={0.008}>
-          <div style={{ fontSize: '18px', fontFamily: 'sans-serif', background: 'white', padding: '2px 6px', borderRadius: '3px', color: '#111', fontWeight: 'bold', pointerEvents: 'none', whiteSpace: 'nowrap' }}>
-            {booth.recruiterName}
-          </div>
-        </Html>
+        <mesh position={[0, 1.0, 0.14]}>
+          <planeGeometry args={[1.4, 0.35]} />
+          <meshStandardMaterial map={nameBadgeTex} />
+        </mesh>
       </group>
 
       {/* Booth light */}
@@ -141,14 +184,8 @@ export function IndustryFair({ booth }: Props) {
       </mesh>
       <mesh position={[27, 3, -14]}>
         <boxGeometry args={[1.5, 2, 0.05]} />
-        <meshStandardMaterial color={AMAZON_DARK} />
+        <meshStandardMaterial map={bannerTex} />
       </mesh>
-      <Html position={[27, 3, -13.95]} center transform scale={0.009}>
-        <div style={{ width: '160px', textAlign: 'center', fontFamily: 'sans-serif', color: AMAZON_ORANGE, fontSize: '14px', fontWeight: 'bold', lineHeight: '1.4', pointerEvents: 'none' }}>
-          Amazon<br />
-          <span style={{ fontSize: '10px', color: '#aaa', fontWeight: 'normal' }}>Computer Vision &amp;<br />Rekognition</span>
-        </div>
-      </Html>
     </group>
   )
 }

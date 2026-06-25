@@ -1,6 +1,7 @@
 'use client'
 
-import { Html } from '@react-three/drei'
+import { useMemo } from 'react'
+import * as THREE from 'three'
 import type { Paper } from '@/lib/types'
 
 interface Props {
@@ -11,6 +12,19 @@ const SEAT_COLOR = '#c0392b'
 const SCREEN_COLOR = '#0a0a14'
 const PODIUM_COLOR = '#1a2b4a'
 
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const words = text.split(' ')
+  const lines: string[] = []
+  let current = ''
+  for (const word of words) {
+    const test = current ? `${current} ${word}` : word
+    if (ctx.measureText(test).width > maxWidth && current) { lines.push(current); current = word }
+    else { current = test }
+  }
+  if (current) lines.push(current)
+  return lines
+}
+
 const SEAT_POSITIONS: [number, number, number][] = [
   // Front row (z=-4)
   [-3.4, 0, -4], [-1.7, 0, -4], [0, 0, -4], [1.7, 0, -4], [3.4, 0, -4],
@@ -19,6 +33,43 @@ const SEAT_POSITIONS: [number, number, number][] = [
 ]
 
 export function OralTheater({ oral }: Props) {
+  const screenTex = useMemo(() => {
+    const W = 860, H = 510
+    const canvas = document.createElement('canvas')
+    canvas.width = W
+    canvas.height = H
+    const ctx = canvas.getContext('2d')!
+    const grad = ctx.createLinearGradient(0, 0, W, H)
+    grad.addColorStop(0, '#0d1535')
+    grad.addColorStop(1, '#1a2550')
+    ctx.fillStyle = grad
+    ctx.fillRect(0, 0, W, H)
+    ctx.textAlign = 'center'
+    let y = 58
+    ctx.fillStyle = '#f59e0b'
+    ctx.font = 'bold 22px system-ui, sans-serif'
+    ctx.fillText('★  CVPR 2026 HIGHLIGHT PAPER', W / 2, y)
+    y += 52
+    ctx.fillStyle = '#ffffff'
+    ctx.font = 'bold 32px system-ui, sans-serif'
+    for (const line of wrapText(ctx, oral.title, W - 80)) { ctx.fillText(line, W / 2, y); y += 40 }
+    y += 10
+    ctx.fillStyle = '#a0b4d0'
+    ctx.font = '23px system-ui, sans-serif'
+    ctx.fillText(`${oral.authors[0]} et al.`, W / 2, y)
+    y += 36
+    ctx.fillStyle = '#5a7a9a'
+    ctx.font = '17px system-ui, sans-serif'
+    for (const line of wrapText(ctx, oral.abstract.slice(0, 180) + '…', W - 80).slice(0, 4)) { ctx.fillText(line, W / 2, y); y += 24 }
+    y += 12
+    ctx.fillStyle = '#c0392b'
+    ctx.font = '17px system-ui, sans-serif'
+    ctx.fillText('Walk to the front row and press E to attend the talk', W / 2, Math.min(y, H - 24))
+    const t = new THREE.CanvasTexture(canvas)
+    t.needsUpdate = true
+    return t
+  }, [oral])
+
   return (
     <group>
       {/* Big screen */}
@@ -27,47 +78,17 @@ export function OralTheater({ oral }: Props) {
         <meshStandardMaterial color={SCREEN_COLOR} />
       </mesh>
 
-      {/* Screen emissive frame */}
+      {/* Screen content */}
       <mesh position={[1, 3.5, -17.9]}>
         <boxGeometry args={[8.6, 5.1, 0.05]} />
-        <meshStandardMaterial color="#0d1535" emissive="#0d1535" emissiveIntensity={1} />
+        <meshStandardMaterial
+          key={screenTex ? 'screen-tex' : 'screen-plain'}
+          emissiveMap={screenTex ?? undefined}
+          emissive="#ffffff"
+          emissiveIntensity={0.9}
+          color="#000000"
+        />
       </mesh>
-
-      {/* Screen content */}
-      <Html position={[1, 3.5, -17.7]} center transform scale={0.022}>
-        <div
-          style={{
-            width: '380px',
-            height: '225px',
-            background: 'linear-gradient(135deg, #0d1535 0%, #1a2550 100%)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '10px',
-            padding: '20px',
-            fontFamily: 'system-ui, sans-serif',
-            color: 'white',
-            pointerEvents: 'none',
-          }}
-        >
-          <div style={{ fontSize: '8px', color: '#f59e0b', letterSpacing: '2px', fontWeight: 'bold' }}>
-            ★ CVPR 2026 HIGHLIGHT PAPER
-          </div>
-          <div style={{ fontSize: '14px', fontWeight: '700', textAlign: 'center', lineHeight: '1.3' }}>
-            {oral.title}
-          </div>
-          <div style={{ fontSize: '9px', color: '#a0b4d0' }}>
-            {oral.authors[0]} et al.
-          </div>
-          <div style={{ fontSize: '7px', color: '#5a7a9a', textAlign: 'center', lineHeight: '1.4', marginTop: '4px' }}>
-            {oral.abstract.slice(0, 120)}…
-          </div>
-          <div style={{ fontSize: '7px', color: '#c0392b', marginTop: '4px' }}>
-            Walk to the front row and press E to attend the talk
-          </div>
-        </div>
-      </Html>
 
       {/* Screen light */}
       <pointLight position={[1, 3.5, -15]} intensity={8} distance={18} color="#304060" />
