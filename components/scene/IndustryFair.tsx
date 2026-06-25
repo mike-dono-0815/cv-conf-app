@@ -53,8 +53,7 @@ export function IndustryFair({ booth }: Props) {
     ctx.fillText('Amazon', W / 2, 130)
     ctx.fillStyle = '#aaaaaa'
     ctx.font = '34px system-ui, sans-serif'
-    ctx.fillText('Computer Vision &', W / 2, 220)
-    ctx.fillText('Rekognition', W / 2, 270)
+    ctx.fillText('Computer Vision', W / 2, 230)
     const t = new THREE.CanvasTexture(canvas)
     t.needsUpdate = true
     return t
@@ -178,8 +177,8 @@ export function IndustryFair({ booth }: Props) {
       <pointLight position={[20, 5, -14]} intensity={12} distance={16} color="#fff8f0" />
 
       {/* Banner stand */}
-      <mesh position={[27, 1.5, -14]}>
-        <boxGeometry args={[0.06, 3, 0.06]} />
+      <mesh position={[27, 1, -14]}>
+        <boxGeometry args={[0.06, 2, 0.06]} />
         <meshStandardMaterial color="#555" />
       </mesh>
       <mesh position={[27, 3, -14]}>
