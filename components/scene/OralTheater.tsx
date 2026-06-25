@@ -12,10 +12,10 @@ const SCREEN_COLOR = '#0a0a14'
 const PODIUM_COLOR = '#1a2b4a'
 
 const SEAT_POSITIONS: [number, number, number][] = [
-  // Front row (z=-7)
-  [-3, 0, -7], [0, 0, -7], [3, 0, -7],
-  // Back row (z=-9.5)
-  [-3, 0, -9.5], [0, 0, -9.5], [3, 0, -9.5],
+  // Front row (z=-4)
+  [-3.4, 0, -4], [-1.7, 0, -4], [0, 0, -4], [1.7, 0, -4], [3.4, 0, -4],
+  // Back row (z=-6)
+  [-3.4, 0, -6], [-1.7, 0, -6], [0, 0, -6], [1.7, 0, -6], [3.4, 0, -6],
 ]
 
 export function OralTheater({ oral }: Props) {
@@ -110,28 +110,21 @@ export function OralTheater({ oral }: Props) {
         <Seat key={i} position={[x, 0, z]} />
       ))}
 
-      {/* Step risers for back row */}
-      <mesh position={[0, 0.12, -9.5]}>
-        <boxGeometry args={[10, 0.24, 3]} />
-        <meshStandardMaterial color="#b8bcc8" />
-      </mesh>
     </group>
   )
 }
 
 function Seat({ position }: { position: [number, number, number] }) {
   const [x, y, z] = position
-  const isBack = z < -8
-  const yOff = isBack ? 0.24 : 0
   return (
-    <group position={[x, y + yOff, z]}>
+    <group position={[x, y, z]}>
       {/* Seat base */}
       <mesh position={[0, 0.24, 0]}>
         <boxGeometry args={[0.7, 0.08, 0.6]} />
         <meshStandardMaterial color={SEAT_COLOR} />
       </mesh>
       {/* Back rest */}
-      <mesh position={[0, 0.6, -0.26]}>
+      <mesh position={[0, 0.6, 0.26]}>
         <boxGeometry args={[0.7, 0.6, 0.08]} />
         <meshStandardMaterial color={SEAT_COLOR} />
       </mesh>
