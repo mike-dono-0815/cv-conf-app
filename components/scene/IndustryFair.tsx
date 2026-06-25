@@ -177,11 +177,11 @@ export function IndustryFair({ booth }: Props) {
       <pointLight position={[20, 5, -14]} intensity={12} distance={16} color="#fff8f0" />
 
       {/* Banner stand */}
-      <mesh position={[27, 1, -14]}>
+      <mesh position={[27, 1, -12.4]}>
         <boxGeometry args={[0.06, 2, 0.06]} />
         <meshStandardMaterial color="#555" />
       </mesh>
-      <mesh position={[27, 3, -14]}>
+      <mesh position={[27, 3, -12.4]}>
         <boxGeometry args={[1.5, 2, 0.05]} />
         <meshStandardMaterial map={bannerTex} />
       </mesh>
