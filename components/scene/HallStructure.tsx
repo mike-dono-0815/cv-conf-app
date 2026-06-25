@@ -1,6 +1,5 @@
 'use client'
 
-import { Html } from '@react-three/drei'
 import { useMemo } from 'react'
 import * as THREE from 'three'
 
@@ -108,15 +107,7 @@ export function HallStructure() {
       <ZoneBanner position={[19, 5.5, -19.5]} text="INDUSTRY FAIR" color="#663300" />
 
       {/* CVPR 2026 entry banner */}
-      <mesh position={[0, 6, 19.5]}>
-        <boxGeometry args={[20, 1.2, 0.1]} />
-        <meshStandardMaterial color="#c0392b" />
-      </mesh>
-      <Html position={[0, 6, 19.4]} center transform>
-        <div style={{ color: 'white', fontFamily: 'sans-serif', fontWeight: 'bold', fontSize: '18px', whiteSpace: 'nowrap', pointerEvents: 'none' }}>
-          CVPR 2026
-        </div>
-      </Html>
+      <CvprBanner />
 
       {/* Ceiling lights */}
       {[-15, 0, 15].map((x) =>
@@ -135,17 +126,55 @@ export function HallStructure() {
 }
 
 function ZoneBanner({ position, text, color }: { position: [number, number, number]; text: string; color: string }) {
+  const tex = useMemo(() => {
+    const W = 1200, H = 80
+    const canvas = document.createElement('canvas')
+    canvas.width = W
+    canvas.height = H
+    const ctx = canvas.getContext('2d')!
+    ctx.fillStyle = color
+    ctx.fillRect(0, 0, W, H)
+    ctx.fillStyle = '#ffffff'
+    ctx.font = 'bold 40px system-ui, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(text, W / 2, H / 2)
+    const t = new THREE.CanvasTexture(canvas)
+    t.needsUpdate = true
+    return t
+  }, [text, color])
+
   return (
-    <group position={position}>
-      <mesh>
-        <boxGeometry args={[12, 0.8, 0.1]} />
-        <meshStandardMaterial color={color} />
-      </mesh>
-      <Html center transform>
-        <div style={{ color: 'white', fontFamily: 'sans-serif', fontWeight: 'bold', fontSize: '14px', letterSpacing: '2px', whiteSpace: 'nowrap', pointerEvents: 'none' }}>
-          {text}
-        </div>
-      </Html>
-    </group>
+    <mesh position={position}>
+      <boxGeometry args={[12, 0.8, 0.1]} />
+      <meshStandardMaterial map={tex} />
+    </mesh>
+  )
+}
+
+function CvprBanner() {
+  const tex = useMemo(() => {
+    const W = 2000, H = 120
+    const canvas = document.createElement('canvas')
+    canvas.width = W
+    canvas.height = H
+    const ctx = canvas.getContext('2d')!
+    ctx.fillStyle = '#c0392b'
+    ctx.fillRect(0, 0, W, H)
+    ctx.fillStyle = '#ffffff'
+    ctx.font = 'bold 72px system-ui, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText('CVPR 2026', W / 2, H / 2)
+    const t = new THREE.CanvasTexture(canvas)
+    t.needsUpdate = true
+    return t
+  }, [])
+
+  return (
+    <mesh position={[0, 6, 19.5]}>
+      <boxGeometry args={[20, 1.2, 0.1]} />
+      <meshStandardMaterial map={tex} />
+    </mesh>
   )
 }
