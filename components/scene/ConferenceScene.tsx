@@ -7,6 +7,7 @@ import { PosterHall } from './PosterHall'
 import { OralTheater } from './OralTheater'
 import { IndustryFair } from './IndustryFair'
 import { HallStructure } from './HallStructure'
+import { FloorArrows } from './FloorArrows'
 import { ChatPanel } from '../ui/ChatPanel'
 import { VideoOverlay } from '../ui/VideoOverlay'
 import type { InteractionType, Interactable } from '@/lib/types'
@@ -20,7 +21,7 @@ const INTERACTABLES: Interactable[] = [
   { id: 'poster-3', label: 'Chat with Ruichao Yang', position: [-23, 1.7, -2], interaction: { type: 'poster', paperId: '38400' } },
   { id: 'poster-4', label: 'Chat with Haojie Zheng', position: [-17, 1.7, -2], interaction: { type: 'poster', paperId: '38700' } },
   // Oral seat – front row center
-  { id: 'oral-seat', label: 'Sit down & watch talk', position: [0, 1.7, -7], interaction: { type: 'oral', paperId: '39000' } },
+  { id: 'oral-seat', label: 'Sit down & watch talk', position: [0, 1.7, -8], radius: 6, interaction: { type: 'oral', paperId: '39000' } },
   // Amazon booth
   { id: 'booth', label: 'Talk to Amazon recruiter', position: [20, 1.7, -10], interaction: { type: 'booth' } },
 ]
@@ -30,7 +31,8 @@ export default function ConferenceScene() {
   const [nearbyLabel, setNearbyLabel] = useState<string | null>(null)
   const [zoneLabel, setZoneLabel] = useState<string>('Entrance')
   const [isLocked, setIsLocked] = useState(false)
-  const controlsRef = useRef<{ unlock: () => void } | null>(null)
+  const [relocking, setRelocking] = useState(false)
+  const controlsRef = useRef<{ unlock: () => void; lock: () => void } | null>(null)
 
   const openInteraction = useCallback((item: Interactable) => {
     setInteraction(item.interaction)
@@ -39,6 +41,8 @@ export default function ConferenceScene() {
 
   const closeInteraction = useCallback(() => {
     setInteraction({ type: 'none' })
+    setRelocking(true)
+    controlsRef.current?.lock()
   }, [])
 
   const activePaperId =
@@ -56,6 +60,7 @@ export default function ConferenceScene() {
         camera={{ fov: 75, near: 0.1, far: 200, position: [0, 1.7, 18] }}
         shadows={false}
         gl={{ antialias: true }}
+        style={{ pointerEvents: interaction.type !== 'none' ? 'none' : 'auto' }}
       >
         <Suspense fallback={null}>
           <ambientLight intensity={0.6} />
@@ -63,6 +68,7 @@ export default function ConferenceScene() {
           <directionalLight position={[-10, 8, -5]} intensity={0.3} color="#a0b0d0" />
 
           <HallStructure />
+          <FloorArrows />
           <PosterHall papers={conferenceData.posters as any} />
           <OralTheater oral={conferenceData.oral as any} />
           <IndustryFair booth={conferenceData.booth as any} />
@@ -72,7 +78,7 @@ export default function ConferenceScene() {
             onNearby={setNearbyLabel}
             onInteract={openInteraction}
             onZoneChange={setZoneLabel}
-            onLockChange={setIsLocked}
+            onLockChange={(locked) => { setIsLocked(locked); if (locked) setRelocking(false) }}
             controlsRef={controlsRef}
             disabled={interaction.type !== 'none'}
           />
@@ -80,7 +86,7 @@ export default function ConferenceScene() {
       </Canvas>
 
       {/* Click-to-start overlay */}
-      {!isLocked && interaction.type === 'none' && (
+      {!isLocked && !relocking && interaction.type === 'none' && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="flex flex-col items-center gap-2 bg-black/60 backdrop-blur-sm px-8 py-5 rounded-2xl border border-white/10">
             <p className="text-white font-semibold text-lg">Click anywhere to look around</p>

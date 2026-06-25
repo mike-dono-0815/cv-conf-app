@@ -12,7 +12,7 @@ interface Props {
   onInteract: (item: Interactable) => void
   onZoneChange: (zone: string) => void
   onLockChange: (locked: boolean) => void
-  controlsRef: MutableRefObject<{ unlock: () => void } | null>
+  controlsRef: MutableRefObject<{ unlock: () => void; lock: () => void } | null>
   disabled: boolean
 }
 
@@ -50,7 +50,10 @@ export function FirstPersonPlayer({
 
   useEffect(() => {
     if (controls.current) {
-      controlsRef.current = { unlock: () => controls.current?.unlock() }
+      controlsRef.current = {
+        unlock: () => controls.current?.unlock(),
+        lock: () => controls.current?.lock(),
+      }
     }
   })
 
@@ -61,6 +64,7 @@ export function FirstPersonPlayer({
       if (e.code === 'KeyS') keys.current.s = true
       if (e.code === 'KeyD') keys.current.d = true
       if (e.code === 'KeyE' && !disabled && nearbyRef.current && lockedRef.current) {
+        e.preventDefault()
         onInteract(nearbyRef.current)
       }
     }
@@ -125,13 +129,14 @@ export function FirstPersonPlayer({
 
     // Proximity to interactables
     let closest: Interactable | null = null
-    let closestDist = INTERACTION_RADIUS
+    let closestDist = Infinity
 
     for (const item of interactables) {
       const dx = camera.position.x - item.position[0]
       const dz = camera.position.z - item.position[2]
       const dist = Math.sqrt(dx * dx + dz * dz)
-      if (dist < closestDist) {
+      const radius = item.radius ?? INTERACTION_RADIUS
+      if (dist < radius && dist < closestDist) {
         closest = item
         closestDist = dist
       }

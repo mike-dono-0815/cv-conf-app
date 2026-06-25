@@ -44,5 +44,6 @@ export interface Interactable {
   id: string
   label: string
   position: [number, number, number]
+  radius?: number
   interaction: InteractionType
 }
