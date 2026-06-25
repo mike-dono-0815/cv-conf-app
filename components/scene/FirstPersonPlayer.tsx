@@ -12,7 +12,7 @@ interface Props {
   onInteract: (item: Interactable) => void
   onZoneChange: (zone: string) => void
   onLockChange: (locked: boolean) => void
-  controlsRef: MutableRefObject<{ unlock: () => void; lock: () => void } | null>
+  controlsRef: MutableRefObject<{ unlock: () => void } | null>
   disabled: boolean
 }
 
@@ -50,10 +50,7 @@ export function FirstPersonPlayer({
 
   useEffect(() => {
     if (controls.current) {
-      controlsRef.current = {
-        unlock: () => controls.current?.unlock(),
-        lock: () => controls.current?.lock(),
-      }
+      controlsRef.current = { unlock: () => controls.current?.unlock() }
     }
   })
 

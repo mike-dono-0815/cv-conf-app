@@ -32,7 +32,7 @@ export default function ConferenceScene() {
   const [zoneLabel, setZoneLabel] = useState<string>('Entrance')
   const [isLocked, setIsLocked] = useState(false)
   const [relocking, setRelocking] = useState(false)
-  const controlsRef = useRef<{ unlock: () => void; lock: () => void } | null>(null)
+  const controlsRef = useRef<{ unlock: () => void } | null>(null)
 
   const openInteraction = useCallback((item: Interactable) => {
     setInteraction(item.interaction)
@@ -42,7 +42,6 @@ export default function ConferenceScene() {
   const closeInteraction = useCallback(() => {
     setInteraction({ type: 'none' })
     setRelocking(true)
-    controlsRef.current?.lock()
   }, [])
 
   const activePaperId =
@@ -85,12 +84,14 @@ export default function ConferenceScene() {
         </Suspense>
       </Canvas>
 
-      {/* Click-to-start overlay */}
-      {!isLocked && !relocking && interaction.type === 'none' && (
+      {/* Click-to-start / click-to-continue overlay */}
+      {!isLocked && interaction.type === 'none' && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="flex flex-col items-center gap-2 bg-black/60 backdrop-blur-sm px-8 py-5 rounded-2xl border border-white/10">
-            <p className="text-white font-semibold text-lg">Click anywhere to look around</p>
-            <p className="text-slate-400 text-sm">WASD to move · E to interact · ESC to pause</p>
+            <p className="text-white font-semibold text-lg">
+              {relocking ? 'Click to continue' : 'Click anywhere to look around'}
+            </p>
+            {!relocking && <p className="text-slate-400 text-sm">WASD to move · E to interact · ESC to pause</p>}
           </div>
         </div>
       )}

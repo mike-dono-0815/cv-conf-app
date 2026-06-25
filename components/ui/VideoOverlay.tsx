@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import ReactMarkdown from 'react-markdown'
 import type { ChatMessage, Paper } from '@/lib/types'
 
 interface Props {
@@ -54,7 +55,8 @@ export function VideoOverlay({ paper, onClose }: Props) {
       const res = await fetch('/api/chat/oral', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: nextMessages, paperId: paper.id }),
+        // slice(1) drops the UI-only opening greeting — Mistral requires conversations to start with a user message
+        body: JSON.stringify({ messages: nextMessages.slice(1), paperId: paper.id }),
       })
 
       if (!res.ok) {
@@ -66,21 +68,24 @@ export function VideoOverlay({ paper, onClose }: Props) {
       const reader = res.body!.getReader()
       const decoder = new TextDecoder()
       let accumulated = ''
+      let buffer = ''
       setMessages(prev => [...prev, { role: 'assistant', content: '' }])
 
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
 
-        const chunk = decoder.decode(value, { stream: true })
-        const lines = chunk.split('\n')
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split(/\r?\n/)
+        buffer = lines.pop() ?? ''
+
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue
           const data = line.slice(6).trim()
           if (data === '[DONE]') break
           try {
             const parsed = JSON.parse(data)
-            const content = parsed.choices?.[0]?.delta?.content ?? ''
+            const content = parsed.content ?? ''
             if (content) {
               accumulated += content
               setMessages(prev => [...prev.slice(0, -1), { role: 'assistant', content: accumulated }])
@@ -212,7 +217,21 @@ export function VideoOverlay({ paper, onClose }: Props) {
                       }`}
                       style={{ background: msg.role === 'assistant' ? 'rgba(255,255,255,0.07)' : undefined }}
                     >
-                      {msg.content || (streaming && i === messages.length - 1 ? (
+                      {msg.content ? (
+                        <ReactMarkdown
+                          components={{
+                            p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                            strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
+                            em: ({ children }) => <em className="italic">{children}</em>,
+                            code: ({ children }) => <code className="bg-white/10 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
+                            ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-0.5">{children}</ul>,
+                            ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-0.5">{children}</ol>,
+                            li: ({ children }) => <li>{children}</li>,
+                          }}
+                        >
+                          {msg.content}
+                        </ReactMarkdown>
+                      ) : (streaming && i === messages.length - 1 ? (
                         <span className="inline-flex gap-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
                           <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }} />
