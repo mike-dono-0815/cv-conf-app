@@ -212,15 +212,7 @@ function PosterBoard({ paper, position }: { paper: Paper; position: [number, num
 
   return (
     <group position={[x, 0, z]}>
-      {/* Easel legs */}
-      <mesh position={[-0.5, 1, 0.3]} rotation={[0.15, 0, 0]}>
-        <boxGeometry args={[0.06, 2, 0.06]} />
-        <meshStandardMaterial color={EASEL_COLOR} />
-      </mesh>
-      <mesh position={[0.5, 1, 0.3]} rotation={[0.15, 0, 0]}>
-        <boxGeometry args={[0.06, 2, 0.06]} />
-        <meshStandardMaterial color={EASEL_COLOR} />
-      </mesh>
+      {/* Easel leg */}
       <mesh position={[0, 1, -0.2]} rotation={[-0.1, 0, 0]}>
         <boxGeometry args={[0.06, 2.2, 0.06]} />
         <meshStandardMaterial color={EASEL_COLOR} />
