@@ -95,6 +95,8 @@ export function FirstPersonPlayer({
     if (keys.current.a) move.addScaledVector(right, -1)
     if (keys.current.d) move.addScaledVector(right, 1)
 
+    const prevX = camera.position.x
+
     if (move.length() > 0) {
       move.normalize().multiplyScalar(SPEED * delta)
       camera.position.add(move)
@@ -103,6 +105,16 @@ export function FirstPersonPlayer({
     camera.position.y = 1.7
     camera.position.x = Math.max(HALL_X[0], Math.min(HALL_X[1], camera.position.x))
     camera.position.z = Math.max(HALL_Z[0], Math.min(HALL_Z[1], camera.position.z))
+
+    // Separator wall collision — walls at x=-7 and x=9, solid from z=-18.3 to z=14.3
+    // Gap at z > 14.3 (south end, near player start) lets players through to each zone
+    if (camera.position.z > -18.3 && camera.position.z < 14.3) {
+      for (const wx of [-7, 9] as const) {
+        if (Math.abs(camera.position.x - wx) < 0.7) {
+          camera.position.x = wx + (prevX <= wx ? -1 : 1) * 0.7
+        }
+      }
+    }
 
     // Zone detection
     const zone = getZone(camera.position.x)
