@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import ReactMarkdown from 'react-markdown'
 import type { ChatMessage, InteractionType, Paper, BoothData } from '@/lib/types'
 
 interface Props {
@@ -106,7 +107,7 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
         if (done) break
 
         buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split('\n')
+        const lines = buffer.split(/\r?\n/)
         buffer = lines.pop() ?? ''
 
         for (const line of lines) {
@@ -205,7 +206,21 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
               }`}
               style={{ background: msg.role === 'assistant' ? 'rgba(255,255,255,0.07)' : undefined }}
             >
-              {msg.content || (streaming && i === messages.length - 1 ? (
+              {msg.content ? (
+                <ReactMarkdown
+                  components={{
+                    p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                    strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
+                    em: ({ children }) => <em className="italic">{children}</em>,
+                    code: ({ children }) => <code className="bg-white/10 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
+                    ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-0.5">{children}</ul>,
+                    ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-0.5">{children}</ol>,
+                    li: ({ children }) => <li>{children}</li>,
+                  }}
+                >
+                  {msg.content}
+                </ReactMarkdown>
+              ) : (streaming && i === messages.length - 1 ? (
                 <span className="inline-flex gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }} />
