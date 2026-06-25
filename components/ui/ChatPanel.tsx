@@ -116,7 +116,7 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
           if (data === '[DONE]') break
           try {
             const parsed = JSON.parse(data)
-            const content = parsed.choices?.[0]?.delta?.content ?? ''
+            const content = parsed.content ?? ''
             if (content) {
               accumulated += content
               setMessages(prev => [

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import conferenceData from '@/data/conference.json'
 
-export const runtime = 'edge'
-
 export async function POST(req: NextRequest) {
   const { messages, paperId } = await req.json()
 
@@ -42,11 +40,45 @@ Respond as the author would at a real poster session — knowledgeable, enthusia
     return NextResponse.json({ error: err }, { status: mistralRes.status })
   }
 
-  return new Response(mistralRes.body, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'X-Accel-Buffering': 'no',
+  return mistralStreamToCleanSSE(mistralRes)
+}
+
+function mistralStreamToCleanSSE(mistralRes: Response): Response {
+  const encoder = new TextEncoder()
+  const stream = new ReadableStream({
+    async start(controller) {
+      const reader = mistralRes.body!.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          buffer += decoder.decode(value, { stream: true })
+          const lines = buffer.split(/\r?\n/)
+          buffer = lines.pop() ?? ''
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue
+            const data = line.slice(6).trim()
+            if (data === '[DONE]') {
+              controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+              return
+            }
+            try {
+              const parsed = JSON.parse(data)
+              const content = parsed.choices?.[0]?.delta?.content
+              if (content) {
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`))
+              }
+            } catch { /* skip malformed events */ }
+          }
+        }
+      } finally {
+        controller.close()
+      }
     },
+  })
+  return new Response(stream, {
+    headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' },
   })
 }
