@@ -59,7 +59,6 @@ export default function ConferenceScene() {
         camera={{ fov: 75, near: 0.1, far: 200, position: [0, 1.7, 18] }}
         shadows={false}
         gl={{ antialias: true }}
-        style={{ pointerEvents: interaction.type !== 'none' ? 'none' : 'auto' }}
       >
         <Suspense fallback={null}>
           <ambientLight intensity={0.6} />

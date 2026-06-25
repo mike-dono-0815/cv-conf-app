@@ -36,7 +36,7 @@ export function FirstPersonPlayer({
   controlsRef,
   disabled,
 }: Props) {
-  const { camera } = useThree()
+  const { camera, gl } = useThree()
   const keys = useRef({ w: false, a: false, s: false, d: false })
   const nearbyRef = useRef<Interactable | null>(null)
   const lockedRef = useRef(false)
@@ -47,6 +47,15 @@ export function FirstPersonPlayer({
     camera.position.set(0, 1.7, 18)
     camera.lookAt(0, 1.7, 0)
   }, [camera])
+
+  // In chat/interaction mode: block canvas clicks so PointerLockControls cannot re-acquire lock
+  useEffect(() => {
+    if (!disabled) return
+    controls.current?.unlock()
+    const block = (e: MouseEvent) => e.stopImmediatePropagation()
+    gl.domElement.addEventListener('click', block, true)
+    return () => gl.domElement.removeEventListener('click', block, true)
+  }, [disabled, gl.domElement])
 
   useEffect(() => {
     if (controls.current) {
