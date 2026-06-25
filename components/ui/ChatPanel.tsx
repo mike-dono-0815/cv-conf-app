@@ -69,8 +69,16 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
     setStreaming(true)
 
     const endpoint = getEndpoint(interaction.type)
-    const body: Record<string, unknown> = { messages: nextMessages }
+    // Drop the UI-only opening greeting (index 0) — Mistral requires conversations to start with a user message
+    const apiMessages = nextMessages.slice(1)
+    const body: Record<string, unknown> = { messages: apiMessages }
     if (interaction.type === 'poster') body.paperId = interaction.paperId
+
+    const busyMsg = paper
+      ? `Sorry, ${paper.firstAuthor} is absolutely swamped with questions right now and can't respond — try again in a moment!`
+      : booth
+      ? `Sorry, ${booth.recruiterName} is tied up with another visitor right now — try again in a moment!`
+      : "The presenter is unavailable right now — try again shortly!"
 
     try {
       const res = await fetch(endpoint, {
@@ -80,7 +88,7 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
       })
 
       if (!res.ok) {
-        setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }])
+        setMessages(prev => [...prev, { role: 'assistant', content: busyMsg }])
         setStreaming(false)
         return
       }
@@ -118,7 +126,7 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
         }
       }
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error. Please try again.' }])
+      setMessages(prev => [...prev, { role: 'assistant', content: busyMsg }])
     }
 
     setStreaming(false)
