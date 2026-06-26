@@ -230,7 +230,11 @@ function HangingBanner({ x, z, text, metal }: { x: number; z: number; text: stri
     <group>
       <mesh position={[x, 4.9, z]}>
         <planeGeometry args={[7.2, 1.44]} />
-        <meshStandardMaterial map={map} roughness={0.9} side={THREE.DoubleSide} />
+        <meshStandardMaterial map={map} roughness={0.9} />
+      </mesh>
+      <mesh position={[x, 4.9, z - 0.01]} rotation={[0, Math.PI, 0]}>
+        <planeGeometry args={[7.2, 1.44]} />
+        <meshStandardMaterial color="#26304a" roughness={0.9} />
       </mesh>
       <mesh position={[x, 5.72, z]} material={metal}><boxGeometry args={[7.4, 0.08, 0.08]} /></mesh>
       {[-3.4, 3.4].map((dx) => (

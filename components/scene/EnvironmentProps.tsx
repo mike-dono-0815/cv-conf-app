@@ -102,6 +102,7 @@ export function EnvironmentProps() {
         <mesh position={[0, 0.52, 0]} castShadow receiveShadow material={mats.deskBody}><boxGeometry args={[4, 1.05, 1]} /></mesh>
         <mesh position={[0, 1.06, 0]} material={mats.gold}><boxGeometry args={[4.2, 0.1, 1.2]} /></mesh>
         <mesh position={[0, 2.2, -0.4]}><planeGeometry args={[3.4, 0.8]} /><meshStandardMaterial map={regTex} /></mesh>
+        <mesh position={[0, 2.2, -0.41]} rotation={[0, Math.PI, 0]}><planeGeometry args={[3.4, 0.8]} /><meshStandardMaterial color="#26304a" roughness={0.9} /></mesh>
         {[-1.6, 1.6].map((dx) => (
           <mesh key={dx} position={[dx, 1.65, -0.3]} material={mats.metal}><boxGeometry args={[0.06, 1.2, 0.06]} /></mesh>
         ))}
