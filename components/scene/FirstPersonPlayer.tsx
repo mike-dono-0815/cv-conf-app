@@ -27,11 +27,22 @@ const OBSTACLE_AABBS: [number, number, number, number][] = [
   [-25,  10,   1.9, 0.9],   // catering table (poster hall)
   [ 27,  12,   1.9, 0.9],   // catering table (industry fair)
   [ 20, -13,   5.4, 1.05],  // industry fair counter
-  [-26, -12,   1.7, 0.9],   // poster board 1
-  [-20, -12,   1.7, 0.9],   // poster board 2
-  [-14, -12,   1.7, 0.9],   // poster board 3
-  [-23,  -6,   1.7, 0.9],   // poster board 4
-  [-17,  -6,   1.7, 0.9],   // poster board 5
+  // Poster boards — row 1 (z=6)
+  [-27,   6,   1.7, 0.9],
+  [-23,   6,   1.7, 0.9],
+  [-19,   6,   1.7, 0.9],
+  [-15,   6,   1.7, 0.9],
+  [-11,   6,   1.7, 0.9],
+  // Poster boards — row 2 (z=-1)
+  [-26,  -1,   1.7, 0.9],
+  [-21,  -1,   1.7, 0.9],
+  [-16,  -1,   1.7, 0.9],
+  [-11,  -1,   1.7, 0.9],
+  // Poster boards — row 3 (z=-8)
+  [-26,  -8,   1.7, 0.9],
+  [-21,  -8,   1.7, 0.9],
+  [-16,  -8,   1.7, 0.9],
+  [-11,  -8,   1.7, 0.9],
   [  1,  -8,   4.9, 5.25],  // oral theater seating platform (rows z=-4 to -12, width 9 centered at x=1)
   [  1, -15.5, 6.9, 2.4],   // oral theater stage
 ]
