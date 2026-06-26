@@ -26,7 +26,7 @@ export function Figure({ position, shirt, pants, skin, rotationY = 0 }: FigurePr
   }), [shirt, pants, skin])
 
   return (
-    <group position={position} rotation={[0, rotationY, 0]}>
+    <group position={position} rotation={[0, rotationY, 0]} scale={[1.5, 1.5, 1.5]}>
       {/* Torso (tapered) */}
       <mesh position={[0, 1.12, 0]} castShadow material={mats.shirt}><cylinderGeometry args={[0.2, 0.26, 0.72, 12]} /></mesh>
       {/* Shoulders */}

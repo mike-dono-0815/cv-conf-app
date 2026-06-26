@@ -38,8 +38,8 @@ const PLANTS: PlantSpec[] = [
 // Signs occupy x:−9.75..−4.25, −1.75..3.75, 6.25..11.75 at z≈15–17, so all bin z values
 // are ≤9 or ≥18, and no x values fall inside those ranges at those z bands.
 const BIN_POSITIONS: [number, number, string][] = [
-  // West wall — poster hall, two pairs
-  [-29.2, 6, BIN_GREEN], [-28.4, 6, BIN_BLUE],
+  // West wall — poster hall (z=6 pair moved south of catering table to avoid overlapping poster board)
+  [-29.2, 12.5, BIN_GREEN], [-28.4, 12.5, BIN_BLUE],
   [-29.2, -8, BIN_GREEN], [-28.4, -8, BIN_BLUE],
   // West wall — far north pair
   [-29.2, -16, BIN_GREEN], [-28.4, -16, BIN_BLUE],
