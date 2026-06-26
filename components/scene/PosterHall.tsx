@@ -13,7 +13,7 @@ import type { Paper } from '@/lib/types'
 interface Props { papers: Paper[] }
 
 const POSITIONS: [number, number, number][] = [
-  [-26, 0, -12], [-20, 0, -12], [-14, 0, -12],
+  [-26, 0, -12], [-20, 0, -12], [-14, 0, -12], [-23, 0, -6], [-17, 0, -6],
 ]
 
 const CANVAS_W = 512
@@ -135,9 +135,7 @@ function PosterBoard({ paper, position }: { paper: Paper; position: [number, num
 
   return (
     <group position={[x, 0, z]}>
-      {/* Tripod easel: two angled front legs + back leg */}
-      <mesh position={[-0.9, 1.6, 0.2]} rotation={[0, 0, -0.06]} castShadow material={easelMat}><cylinderGeometry args={[0.035, 0.045, 3.6, 8]} /></mesh>
-      <mesh position={[0.9, 1.6, 0.2]} rotation={[0, 0, 0.06]} castShadow material={easelMat}><cylinderGeometry args={[0.035, 0.045, 3.6, 8]} /></mesh>
+      {/* Single back leg easel support */}
       <mesh position={[0, 1.6, -0.55]} rotation={[-0.18, 0, 0]} castShadow material={easelMat}><cylinderGeometry args={[0.035, 0.045, 3.6, 8]} /></mesh>
 
       {/* Board frame + poster surface */}

@@ -30,6 +30,8 @@ const OBSTACLE_AABBS: [number, number, number, number][] = [
   [-26, -12,   1.7, 0.9],   // poster board 1
   [-20, -12,   1.7, 0.9],   // poster board 2
   [-14, -12,   1.7, 0.9],   // poster board 3
+  [-23,  -6,   1.7, 0.9],   // poster board 4
+  [-17,  -6,   1.7, 0.9],   // poster board 5
 ]
 
 function hitsObstacle(x: number, z: number): boolean {
