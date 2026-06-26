@@ -30,7 +30,7 @@ const PLANTS: PlantSpec[] = [
   { t: 'monstera',      p: [-16, 0,  23], ry: 1.5 },
   { t: 'topiaryBall',   p: [ 22, 0,  23] },
   // Catering tables — small potted plants
-  { t: 'bostonFern',    p: [-25, 0.93, 10], s: 0.38 },
+  { t: 'bostonFern',    p: [-29.3, 0.93, 10], s: 0.38 },
   { t: 'topiaryBall',   p: [ 27, 0.93, 12], s: 0.38 },
 ]
 
@@ -124,7 +124,7 @@ export function EnvironmentProps() {
       ))}
 
       {/* Catering tables — poster hall break area + industry fair break area */}
-      <CateringTable x={-25} z={10} mats={mats} />
+      <CateringTable x={-29.3} z={10} rotY={Math.PI / 2} mats={mats} />
       <CateringTable x={27} z={12} mats={mats} />
     </group>
   )
@@ -171,9 +171,9 @@ function Cooler({ x, z, mats }: { x: number; z: number; mats: any }) {
   )
 }
 
-function CateringTable({ x, z, mats }: { x: number; z: number; mats: any }) {
+function CateringTable({ x, z, rotY = 0, mats }: { x: number; z: number; rotY?: number; mats: any }) {
   return (
-    <group position={[x, 0, z]}>
+    <group position={[x, 0, z]} rotation={[0, rotY, 0]}>
       <mesh position={[0, 0.9, 0]} castShadow receiveShadow material={mats.white}><boxGeometry args={[3, 0.06, 1]} /></mesh>
       {([[-1.4, -0.4], [1.4, -0.4], [-1.4, 0.4], [1.4, 0.4]] as const).map(([dx, dz], i) => (
         <mesh key={i} position={[dx, 0.45, dz]} castShadow material={mats.metal}><boxGeometry args={[0.08, 0.9, 0.08]} /></mesh>

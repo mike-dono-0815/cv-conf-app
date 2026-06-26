@@ -24,7 +24,7 @@ const HALL_Z = [-19, 23] as const
 // [centerX, centerZ, halfW, halfD] — object half-extents + 0.4 player clearance radius
 const OBSTACLE_AABBS: [number, number, number, number][] = [
   [-10,  14,   2.4, 0.9],   // registration desk
-  [-25,  10,   1.9, 0.9],   // catering table (poster hall)
+  [-29.3, 10,  0.9, 1.9],   // catering table (poster hall, against west wall)
   [ 27,  12,   1.9, 0.9],   // catering table (industry fair)
   [ 20, -13,   5.4, 1.05],  // industry fair counter
   // Poster boards — row 1 (z=6)

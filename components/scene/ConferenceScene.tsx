@@ -27,21 +27,21 @@ import conferenceData from '@/data/conference.json'
 
 const INTERACTABLES: Interactable[] = [
   // Row 1 (z=6)
-  { id: 'poster-0',  label: 'Chat with Mohammad Omama', position: [-27, 1.7,  6], interaction: { type: 'poster', paperId: '36715' } },
-  { id: 'poster-1',  label: 'Chat with Xinhai Hou',     position: [-23, 1.7,  6], interaction: { type: 'poster', paperId: '39849' } },
-  { id: 'poster-2',  label: 'Chat with Jinyoung Jun',   position: [-19, 1.7,  6], interaction: { type: 'poster', paperId: '36568' } },
-  { id: 'poster-3',  label: 'Chat with Peijie Qiu',     position: [-15, 1.7,  6], interaction: { type: 'poster', paperId: '38676' } },
-  { id: 'poster-4',  label: 'Chat with Zitian Tang',    position: [-11, 1.7,  6], interaction: { type: 'poster', paperId: '39033' } },
+  { id: 'poster-0',  label: 'Talk about the paper', position: [-27, 1.7,  6], interaction: { type: 'poster', paperId: '36715' } },
+  { id: 'poster-1',  label: 'Talk about the paper', position: [-23, 1.7,  6], interaction: { type: 'poster', paperId: '39849' } },
+  { id: 'poster-2',  label: 'Talk about the paper', position: [-19, 1.7,  6], interaction: { type: 'poster', paperId: '36568' } },
+  { id: 'poster-3',  label: 'Talk about the paper', position: [-15, 1.7,  6], interaction: { type: 'poster', paperId: '38676' } },
+  { id: 'poster-4',  label: 'Talk about the paper', position: [-11, 1.7,  6], interaction: { type: 'poster', paperId: '39033' } },
   // Row 2 (z=-1)
-  { id: 'poster-5',  label: 'Chat with Peiyao Wang',    position: [-26, 1.7, -1], interaction: { type: 'poster', paperId: '36512' } },
-  { id: 'poster-6',  label: 'Chat with Zheda Mai',      position: [-21, 1.7, -1], interaction: { type: 'poster', paperId: '38586' } },
-  { id: 'poster-7',  label: 'Chat with Yijiang Li',     position: [-16, 1.7, -1], interaction: { type: 'poster', paperId: '38920' } },
-  { id: 'poster-8',  label: 'Chat with Arnav Chavan',   position: [-11, 1.7, -1], interaction: { type: 'poster', paperId: '39532' } },
+  { id: 'poster-5',  label: 'Talk about the paper', position: [-26, 1.7, -1], interaction: { type: 'poster', paperId: '36512' } },
+  { id: 'poster-6',  label: 'Talk about the paper', position: [-21, 1.7, -1], interaction: { type: 'poster', paperId: '38586' } },
+  { id: 'poster-7',  label: 'Talk about the paper', position: [-16, 1.7, -1], interaction: { type: 'poster', paperId: '38920' } },
+  { id: 'poster-8',  label: 'Talk about the paper', position: [-11, 1.7, -1], interaction: { type: 'poster', paperId: '39532' } },
   // Row 3 (z=-8)
-  { id: 'poster-9',  label: 'Chat with Wenliang Zhong', position: [-26, 1.7, -8], interaction: { type: 'poster', paperId: '37785' } },
-  { id: 'poster-10', label: 'Chat with Martin Everaert', position: [-21, 1.7, -8], interaction: { type: 'poster', paperId: '38604' } },
-  { id: 'poster-11', label: 'Chat with Qihua Dong',     position: [-16, 1.7, -8], interaction: { type: 'poster', paperId: '41387' } },
-  { id: 'poster-12', label: 'Chat with Chia-Hsiang Kao', position: [-11, 1.7, -8], interaction: { type: 'poster', paperId: '36294' } },
+  { id: 'poster-9',  label: 'Talk about the paper', position: [-26, 1.7, -8], interaction: { type: 'poster', paperId: '37785' } },
+  { id: 'poster-10', label: 'Talk about the paper', position: [-21, 1.7, -8], interaction: { type: 'poster', paperId: '38604' } },
+  { id: 'poster-11', label: 'Talk about the paper', position: [-16, 1.7, -8], interaction: { type: 'poster', paperId: '41387' } },
+  { id: 'poster-12', label: 'Talk about the paper', position: [-11, 1.7, -8], interaction: { type: 'poster', paperId: '36294' } },
   { id: 'oral-seat', label: 'Sit down & watch talk', position: [1, 1.7, -8], radius: 7.5, interaction: { type: 'oral', paperId: '39000' } },
   { id: 'booth', label: 'Talk to Amazon recruiter', position: [20, 1.7, -10], interaction: { type: 'booth' } },
 ]
