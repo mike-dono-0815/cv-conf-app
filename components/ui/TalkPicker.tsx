@@ -21,14 +21,17 @@ export function TalkPicker({ talks, onSelect, onClose }: Props) {
       <div className="w-full max-w-2xl bg-[#0d1117] rounded-2xl border border-white/10 shadow-2xl overflow-hidden" style={{ maxHeight: '90vh' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 flex-shrink-0">
-          <div>
-            <div className="flex items-center gap-2 mb-0.5">
-              <div className="px-2 py-0.5 rounded bg-[#ff9900]/20 text-[#ff9900] text-xs font-bold tracking-wide">
-                ORAL SESSION
+          <div className="flex items-center gap-4">
+            <img src="/cvpr-logo.svg" alt="CVPR" className="h-9 w-auto opacity-90" />
+            <div>
+              <div className="flex items-center gap-2 mb-0.5">
+                <div className="px-2 py-0.5 rounded bg-[#ff9900]/20 text-[#ff9900] text-xs font-bold tracking-wide">
+                  ORAL SESSION
+                </div>
+                <p className="text-white font-semibold">Amazon @ CVPR 2026</p>
               </div>
-              <p className="text-white font-semibold">Amazon @ CVPR 2026</p>
+              <p className="text-slate-500 text-xs">Select a talk to watch</p>
             </div>
-            <p className="text-slate-500 text-xs">Select a talk to watch</p>
           </div>
           <button
             onClick={onClose}

@@ -2,23 +2,36 @@
 
 import { useMemo } from 'react'
 import * as THREE from 'three'
+import { Plant, PlantType } from './Plants'
 
 const GOLD = '#c9a14a'
 const BIN_GREEN = '#2b6b3f'
 const BIN_BLUE = '#2456a6'
 
-// [x, z, scale] — all against walls (±29 / ±19) or in corners
-const PLANT_POSITIONS: [number, number, number][] = [
-  // Four corners
-  [-29, 23, 1.0], [29, 23, 1.0], [-29, -19, 1.0], [29, -19, 1.0],
+type PlantSpec = { t: PlantType; p: [number, number, number]; ry?: number; s?: number }
+const PLANTS: PlantSpec[] = [
+  // Corners — tall statement pieces
+  { t: 'fiddleLeafFig', p: [-29, 0,  23], ry: 0.8 },
+  { t: 'arecaPalm',     p: [ 29, 0,  23], ry: -0.5 },
+  { t: 'arecaPalm',     p: [-29, 0, -19], ry: 0.3 },
+  { t: 'fiddleLeafFig', p: [ 29, 0, -19], ry: -0.8 },
   // West wall — poster hall
-  [-29, 8, 0.9], [-29, -2, 1.0], [-29, -12, 0.95],
+  { t: 'bostonFern',    p: [-29, 0,   8], ry: 0.4 },
+  { t: 'monstera',      p: [-29, 0,  -2], ry: 0.5 },
+  { t: 'snakePlant',    p: [-29, 0, -12], ry: 1.0 },
   // East wall — industry fair
-  [29, 8, 0.95], [29, -2, 1.0], [29, -12, 0.9],
+  { t: 'bamboo',        p: [ 29, 0,   8], ry: -0.4 },
+  { t: 'topiaryBall',   p: [ 29, 0,  -2] },
+  { t: 'bostonFern',    p: [ 29, 0, -12], ry: 0.6 },
   // North wall
-  [-21, -19, 0.85], [20, -19, 0.9],
-  // South wall / lobby (clear of signs centred at z=16)
-  [-16, 23, 0.85], [22, 23, 0.9],
+  { t: 'snakePlant',    p: [-21, 0, -19], ry: 2.0 },
+  { t: 'bamboo',        p: [ 20, 0, -19], ry: -1.0 },
+  // South lobby
+  { t: 'monstera',      p: [-16, 0,  23], ry: 1.5 },
+  { t: 'topiaryBall',   p: [ 22, 0,  23] },
+  // Catering tables — small potted plants
+  { t: 'bostonFern',    p: [-25, 0.93, 10], s: 0.38 },
+  { t: 'topiaryBall',   p: [ 27, 0.93, 12], s: 0.38 },
 ]
 
 // [x, z, color] — green recycling + blue trash in pairs.
@@ -58,9 +71,6 @@ const COOLER_POSITIONS: [number, number][] = [
 export function EnvironmentProps() {
   const mats = useMemo(() => ({
     metal: new THREE.MeshStandardMaterial({ color: '#6f7378', roughness: 0.35, metalness: 0.85 }),
-    pot: new THREE.MeshStandardMaterial({ color: '#3a2c22', roughness: 0.8 }),
-    soil: new THREE.MeshStandardMaterial({ color: '#241a12' }),
-    foliage: new THREE.MeshStandardMaterial({ color: '#3f6b3a', roughness: 0.9 }),
     deskBody: new THREE.MeshStandardMaterial({ color: '#2a3350', roughness: 0.6 }),
     gold: new THREE.MeshStandardMaterial({ color: GOLD, roughness: 0.4, metalness: 0.6 }),
     white: new THREE.MeshStandardMaterial({ color: '#f3f1ea', roughness: 0.9 }),
@@ -80,9 +90,9 @@ export function EnvironmentProps() {
 
   return (
     <group>
-      {/* Plants — corners + all four walls */}
-      {PLANT_POSITIONS.map(([x, z, s], i) => (
-        <Plant key={`pl${i}`} x={x} z={z} s={s} mats={mats} />
+      {/* Plants — corners, walls, and catering tables */}
+      {PLANTS.map((p, i) => (
+        <Plant key={`pl${i}`} type={p.t} position={p.p} rotationY={p.ry ?? 0} scale={p.s ?? 1} />
       ))}
 
       {/* Bins — green recycling + blue trash in pairs */}
@@ -120,23 +130,6 @@ export function EnvironmentProps() {
   )
 }
 
-function Plant({ x, z, s, mats }: { x: number; z: number; s: number; mats: any }) {
-  const blades = useMemo(() => Array.from({ length: 7 }, () => ({
-    px: (Math.random() - 0.5) * 0.3, py: 1.0 + Math.random() * 0.2, pz: (Math.random() - 0.5) * 0.3,
-    h: 1.1 + Math.random() * 0.5, rx: (Math.random() - 0.5) * 0.5, ry: Math.random() * 6, rz: (Math.random() - 0.5) * 0.5,
-  })), [])
-  return (
-    <group position={[x, 0, z]} scale={s}>
-      <mesh position={[0, 0.25, 0]} castShadow receiveShadow material={mats.pot}><cylinderGeometry args={[0.32, 0.24, 0.5, 16]} /></mesh>
-      <mesh position={[0, 0.5, 0]} material={mats.soil}><cylinderGeometry args={[0.3, 0.3, 0.06, 16]} /></mesh>
-      {blades.map((b, i) => (
-        <mesh key={i} position={[b.px, b.py, b.pz]} rotation={[b.rx, b.ry, b.rz]} castShadow material={mats.foliage}>
-          <coneGeometry args={[0.12, b.h, 6]} />
-        </mesh>
-      ))}
-    </group>
-  )
-}
 
 function Bin({ x, z, color, mats }: { x: number; z: number; color: string; mats: any }) {
   return (
