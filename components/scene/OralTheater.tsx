@@ -6,7 +6,7 @@
 // red chairs on metal stems, and the refined <Figure/> speaker.
 // Keeps the same `oral` prop + screen content layout.
 
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { Figure } from './Figure'
 import { AMAZON_TALKS } from '@/lib/amazonTalks'
@@ -23,17 +23,20 @@ function fabricTexture(hex: string) {
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t
 }
 
-export function OralTheater() {
-  const screenTex = useMemo(() => {
+  function buildScreenCanvas(logo: HTMLImageElement | null): THREE.CanvasTexture {
     const W = 1024, H = 600, c = document.createElement('canvas'); c.width = W; c.height = H
     const ctx = c.getContext('2d')!
     const g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#0d1535'); g.addColorStop(1, '#1c2a55')
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H)
 
-    // Header
-    ctx.textAlign = 'center'
-    ctx.fillStyle = '#e8a33d'; ctx.font = 'bold 24px system-ui'
-    ctx.fillText('★  AMAZON @ CVPR 2026 — ORAL SESSION', W / 2, 44)
+    // Header — CVPR logo left, title right
+    if (logo && logo.naturalWidth > 0) {
+      const lh = 38, lw = lh * (logo.naturalWidth / logo.naturalHeight)
+      ctx.drawImage(logo, 30, (58 - lh) / 2, lw, lh)
+    }
+    ctx.textAlign = 'right'
+    ctx.fillStyle = '#e8a33d'; ctx.font = 'bold 22px system-ui'
+    ctx.fillText('AMAZON @ CVPR 2026 — ORAL SESSION', W - 30, 38)
     ctx.fillStyle = 'rgba(255,255,255,0.18)'; ctx.fillRect(30, 58, W - 60, 1)
 
     // Talk list
@@ -60,6 +63,26 @@ export function OralTheater() {
     ctx.fillText('Sit in the front row and press E to select a talk', W / 2, H - 16)
 
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t
+  }
+
+export function OralTheater() {
+  const [screenTex, setScreenTex] = useState<THREE.CanvasTexture | null>(null)
+  const texRef = useRef<THREE.CanvasTexture | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    // Show immediately without logo, then upgrade once logo loads
+    const initial = buildScreenCanvas(null)
+    texRef.current?.dispose(); texRef.current = initial; setScreenTex(initial)
+
+    const img = new Image(); img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      if (cancelled) return
+      const upgraded = buildScreenCanvas(img)
+      texRef.current?.dispose(); texRef.current = upgraded; setScreenTex(upgraded)
+    }
+    img.src = '/cvpr-logo.svg'
+    return () => { cancelled = true; texRef.current?.dispose() }
   }, [])
 
   const seatFabric = useMemo(() => new THREE.MeshStandardMaterial({ map: fabricTexture('#a33028'), roughness: 0.95 }), [])
@@ -78,7 +101,7 @@ export function OralTheater() {
       <mesh position={[1, 3.6, -18]} castShadow material={bezelMat}><boxGeometry args={[9.6, 6.0, 0.2]} /></mesh>
       <mesh position={[1, 3.6, -17.88]}>
         <planeGeometry args={[8.8, 5.2]} />
-        <meshBasicMaterial map={screenTex} toneMapped={false} />
+        <meshBasicMaterial map={screenTex ?? undefined} toneMapped={false} />
       </mesh>
       <pointLight position={[1, 3.6, -15]} color="#3a5a9a" intensity={1.3} distance={20} decay={2} />
 
