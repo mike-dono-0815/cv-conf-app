@@ -231,8 +231,7 @@ function buildArecaPalm(): THREE.Group {
       rod.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize())
       rod.castShadow = true; frond.add(rod)
       for (const side of [-1, 1]) {
-        const ll = bladeMesh(rand(0.34, 0.5) * (1 - t * 0.35), 0.024)
-        ll.material = mat
+        const ll = bladeMesh(rand(0.34, 0.5) * (1 - t * 0.35), 0.024, mat)
         ll.position.copy(cur)
         ll.rotation.order = 'YXZ'
         ll.rotation.y = side * 1.05
@@ -266,8 +265,7 @@ function buildBamboo(): THREE.Group {
       node.position.set(cx, ph + (s + 1) * (ch / segs), cz); g.add(node)
     }
     for (let l = 0; l < 7; l++) {
-      const lf = bladeMesh(rand(0.3, 0.5), 0.04)
-      lf.material = leaf
+      const lf = bladeMesh(rand(0.3, 0.5), 0.04, leaf)
       lf.position.set(cx, ph + ch - rand(0, 0.5), cz)
       lf.rotation.y = Math.random() * 6; lf.rotation.x = rand(-1, -0.3); g.add(lf)
     }
