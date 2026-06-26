@@ -4,9 +4,9 @@ import { useMemo } from 'react'
 import * as THREE from 'three'
 
 const SIGNS = [
-  { label: 'Poster Hall',    sub: '5 papers',       arrow: '←', bg: '#1a2b6a', x:  -7 },
-  { label: 'Oral Theater',   sub: 'Highlight talk',  arrow: '↑', bg: '#5a1a0a', x:   1 },
-  { label: 'Industry Fair',  sub: 'Amazon booth',    arrow: '→', bg: '#0a3d1f', x:   9 },
+  { label: 'Poster Hall',    sub: '5 papers',       arrow: '←', bg: '#1a2b6a', x:  -8 },
+  { label: 'Oral Theater',   sub: 'Highlight talk',  arrow: '↑', bg: '#5a1a0a', x:   0 },
+  { label: 'Industry Fair',  sub: 'Amazon booth',    arrow: '→', bg: '#0a3d1f', x:   8 },
 ] as const
 
 const W = 640, H = 240
