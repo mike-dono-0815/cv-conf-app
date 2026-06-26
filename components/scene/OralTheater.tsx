@@ -6,7 +6,7 @@
 // red chairs on metal stems, and the refined <Figure/> speaker.
 // Keeps the same `oral` prop + screen content layout.
 
-import { useMemo, useState, useEffect, useRef } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import * as THREE from 'three'
 import { Figure } from './Figure'
 import { AMAZON_TALKS } from '@/lib/amazonTalks'
@@ -66,23 +66,12 @@ function fabricTexture(hex: string) {
   }
 
 export function OralTheater() {
-  const [screenTex, setScreenTex] = useState<THREE.CanvasTexture | null>(null)
-  const texRef = useRef<THREE.CanvasTexture | null>(null)
+  const [screenTex, setScreenTex] = useState<THREE.CanvasTexture>(() => buildScreenCanvas(null))
 
   useEffect(() => {
-    let cancelled = false
-    // Show immediately without logo, then upgrade once logo loads
-    const initial = buildScreenCanvas(null)
-    texRef.current?.dispose(); texRef.current = initial; setScreenTex(initial)
-
-    const img = new Image(); img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      if (cancelled) return
-      const upgraded = buildScreenCanvas(img)
-      texRef.current?.dispose(); texRef.current = upgraded; setScreenTex(upgraded)
-    }
+    const img = new Image()
+    img.onload = () => { if (img.naturalWidth) setScreenTex(buildScreenCanvas(img)) }
     img.src = '/cvpr-logo.svg'
-    return () => { cancelled = true; texRef.current?.dispose() }
   }, [])
 
   const seatFabric = useMemo(() => new THREE.MeshStandardMaterial({ map: fabricTexture('#a33028'), roughness: 0.95 }), [])
@@ -101,7 +90,7 @@ export function OralTheater() {
       <mesh position={[1, 3.6, -18]} castShadow material={bezelMat}><boxGeometry args={[9.6, 6.0, 0.2]} /></mesh>
       <mesh position={[1, 3.6, -17.88]}>
         <planeGeometry args={[8.8, 5.2]} />
-        <meshBasicMaterial map={screenTex ?? undefined} toneMapped={false} />
+        <meshBasicMaterial map={screenTex} toneMapped={false} />
       </mesh>
       <pointLight position={[1, 3.6, -15]} color="#3a5a9a" intensity={1.3} distance={20} decay={2} />
 

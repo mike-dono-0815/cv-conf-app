@@ -7,7 +7,7 @@
 // HANGING zone banners on rigs, and the CVPR entry banner.
 // All large surfaces receiveShadow; pillars/ban-rigs castShadow.
 
-import { useMemo, useState, useEffect, useRef } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import * as THREE from 'three'
 
 const PILLAR_Z = [-18, -10, -2, 6, 14] as const
@@ -81,44 +81,34 @@ function bannerTexture(text: string) {
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t
 }
 
+function makeBannerTex(img: HTMLImageElement | null): THREE.CanvasTexture {
+  const W = 2000, H = 300, c = document.createElement('canvas'); c.width = W; c.height = H
+  const ctx = c.getContext('2d')!
+  ctx.fillStyle = '#26304a'; ctx.fillRect(0, 0, W, H)
+  if (img && img.naturalWidth > 0) {
+    const lh = H * 0.75, lw = lh * (img.naturalWidth / img.naturalHeight)
+    ctx.drawImage(img, (W - lw) / 2, (H - lh) / 2, lw, lh)
+  } else {
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 160px system-ui'
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+    ctx.fillText('CVPR 2026', W / 2, H / 2)
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t
+}
+
 function CvprBanner() {
-  const [tex, setTex] = useState<THREE.CanvasTexture | null>(null)
-  const texRef = useRef<THREE.CanvasTexture | null>(null)
+  const [tex, setTex] = useState<THREE.CanvasTexture>(() => makeBannerTex(null))
 
   useEffect(() => {
-    let cancelled = false
-    const W = 2000, H = 300
-    const c = document.createElement('canvas'); c.width = W; c.height = H
-    const ctx = c.getContext('2d')!
-
-    const build = (img: HTMLImageElement | null) => {
-      ctx.fillStyle = '#26304a'; ctx.fillRect(0, 0, W, H)
-      if (img && img.naturalWidth > 0) {
-        const lh = H * 0.75
-        const lw = lh * (img.naturalWidth / img.naturalHeight)
-        ctx.drawImage(img, (W - lw) / 2, (H - lh) / 2, lw, lh)
-      } else {
-        ctx.fillStyle = '#fff'; ctx.font = 'bold 160px system-ui'
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-        ctx.fillText('CVPR', W / 2, H / 2)
-      }
-      if (cancelled) return
-      const t = new THREE.CanvasTexture(c)
-      t.colorSpace = THREE.SRGBColorSpace
-      texRef.current?.dispose(); texRef.current = t; setTex(t)
-    }
-
-    build(null)
-    const img = new Image(); img.crossOrigin = 'anonymous'
-    img.onload = () => { if (!cancelled) build(img) }
+    const img = new Image()
+    img.onload = () => { if (img.naturalWidth) setTex(makeBannerTex(img)) }
     img.src = '/cvpr-logo.svg'
-    return () => { cancelled = true; texRef.current?.dispose() }
   }, [])
 
   return (
     <mesh position={[0, 5.4, 23.5]} rotation={[0, Math.PI, 0]}>
       <planeGeometry args={[20, 3]} />
-      <meshStandardMaterial map={tex ?? undefined} roughness={0.85} />
+      <meshStandardMaterial map={tex} roughness={0.85} />
     </mesh>
   )
 }
