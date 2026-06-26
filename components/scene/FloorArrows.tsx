@@ -5,7 +5,7 @@ import * as THREE from 'three'
 
 const SIGNS = [
   { label: 'Poster Hall',    sub: '13 Amazon papers', arrow: '←', bg: '#1a2b6a', x:  -8 },
-  { label: 'Oral Theater',   sub: '6 talks',          arrow: '↑', bg: '#5a1a0a', x:   0 },
+  { label: 'Oral Theater',   sub: '5 talks',          arrow: '↑', bg: '#5a1a0a', x:   0 },
   { label: 'Industry Fair',  sub: 'Amazon booth',     arrow: '→', bg: '#0a3d1f', x:   8 },
 ] as const
 
