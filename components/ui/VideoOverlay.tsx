@@ -121,15 +121,25 @@ export function VideoOverlay({ paper, onClose }: Props) {
               <p className="text-slate-500 text-xs">{paper.firstAuthor} et al. · CVPR 2026 Oral</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
-            title="Close (ESC)"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-2">
+            {phase === 'watching' && (
+              <button
+                onClick={startQA}
+                className="px-4 py-1.5 rounded-lg bg-[#c0392b] hover:bg-[#a93226] text-white text-sm font-semibold transition-colors"
+              >
+                Start Q&amp;A
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+              title="Close (ESC)"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {phase === 'watching' ? (
@@ -170,16 +180,6 @@ export function VideoOverlay({ paper, onClose }: Props) {
               </a>
             </div>
 
-            {/* Q&A button */}
-            <div className="px-6 pb-6 pt-3 border-t border-white/5 flex-shrink-0">
-              <button
-                onClick={startQA}
-                className="w-full py-3 rounded-xl bg-[#c0392b] hover:bg-[#a93226] text-white font-semibold transition-colors"
-              >
-                Start Q&A with the Author
-              </button>
-              <p className="text-slate-600 text-xs text-center mt-2">Talk to {paper.firstAuthor} about the paper</p>
-            </div>
           </div>
         ) : (
           /* Q&A phase */
