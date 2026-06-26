@@ -73,7 +73,7 @@ function useTextures() {
 }
 
 function bannerTexture(text: string) {
-  const W = 768, H = 256, c = document.createElement('canvas'); c.width = W; c.height = H
+  const W = 768, H = 154, c = document.createElement('canvas'); c.width = W; c.height = H
   const ctx = c.getContext('2d')!
   ctx.fillStyle = '#26304a'; ctx.fillRect(0, 0, W, H)
   ctx.fillStyle = '#fff'; ctx.font = 'bold 58px system-ui, sans-serif'
@@ -116,7 +116,7 @@ function CvprBanner() {
   }, [])
 
   return (
-    <mesh position={[0, 5.4, 23.7]} rotation={[0, Math.PI, 0]}>
+    <mesh position={[0, 5.4, 23.5]} rotation={[0, Math.PI, 0]}>
       <planeGeometry args={[20, 3]} />
       <meshStandardMaterial map={tex ?? undefined} roughness={0.85} />
     </mesh>
@@ -229,12 +229,12 @@ function HangingBanner({ x, z, text, metal }: { x: number; z: number; text: stri
   return (
     <group>
       <mesh position={[x, 4.9, z]}>
-        <planeGeometry args={[7.2, 2.4]} />
+        <planeGeometry args={[7.2, 1.44]} />
         <meshStandardMaterial map={map} roughness={0.9} side={THREE.DoubleSide} />
       </mesh>
-      <mesh position={[x, 6.15, z]} material={metal}><boxGeometry args={[7.4, 0.08, 0.08]} /></mesh>
+      <mesh position={[x, 5.72, z]} material={metal}><boxGeometry args={[7.4, 0.08, 0.08]} /></mesh>
       {[-3.4, 3.4].map((dx) => (
-        <mesh key={dx} position={[x + dx, 5.65, z]} material={metal}><boxGeometry args={[0.03, 1.0, 0.03]} /></mesh>
+        <mesh key={dx} position={[x + dx, 5.37, z]} material={metal}><boxGeometry args={[0.03, 0.6, 0.03]} /></mesh>
       ))}
     </group>
   )

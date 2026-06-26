@@ -35,7 +35,7 @@ const PAPER_FIGURES: Record<string, [string | null, string | null]> = {
   '37785': ['https://arxiv.org/html/2606.24094v1/x1.png',      'https://arxiv.org/html/2606.24094v1/x2.png'],       // Universal Clustering
   '38604': ['https://img.youtube.com/vi/YPrNK54A32c/hqdefault.jpg', null],                                           // Visual Grounding (YouTube thumbnail)
   '41387': ['https://arxiv.org/html/2604.19945v1/x1.png',      'https://arxiv.org/html/2604.19945v1/x2.png'],       // Visual Reasoning RL
-  '36294': [null, null],                                                                                               // δYNAMICS (placeholder)
+  '36294': ['https://arxiv.org/html/2605.20576v1/x1.png',      'https://arxiv.org/html/2605.20576v1/x2.png'],       // δYNAMICS
 }
 
 const CANVAS_W = 512
@@ -199,7 +199,7 @@ function PosterBoard({ paper, position }: { paper: Paper; position: [number, num
   return (
     <group position={[x, 0, z]}>
       {/* Single back leg easel support */}
-      <mesh position={[0, 1.6, -0.55]} rotation={[-0.18, 0, 0]} castShadow material={easelMat}><cylinderGeometry args={[0.035, 0.045, 3.6, 8]} /></mesh>
+      <mesh position={[0, 1.6, -0.55]} rotation={[0.18, 0, 0]} castShadow material={easelMat}><cylinderGeometry args={[0.035, 0.045, 3.6, 8]} /></mesh>
 
       {/* Board frame + poster surface */}
       <mesh position={[0, 2.1, 0]} castShadow receiveShadow material={frameMat}><boxGeometry args={[2.9, 3.9, 0.1]} /></mesh>
