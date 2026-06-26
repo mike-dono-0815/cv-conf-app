@@ -31,7 +31,7 @@ const INTERACTABLES: Interactable[] = [
   { id: 'poster-2', label: 'Chat with Yukuan Min', position: [-14, 1.7, -8], interaction: { type: 'poster', paperId: '38300' } },
   { id: 'poster-3', label: 'Chat with Ruichao Yang', position: [-23, 1.7, -2], interaction: { type: 'poster', paperId: '38400' } },
   { id: 'poster-4', label: 'Chat with Haojie Zheng', position: [-17, 1.7, -2], interaction: { type: 'poster', paperId: '38700' } },
-  { id: 'oral-seat', label: 'Sit down & watch talk', position: [0, 1.7, -8], radius: 6, interaction: { type: 'oral', paperId: '39000' } },
+  { id: 'oral-seat', label: 'Sit down & watch talk', position: [1, 1.7, -8], radius: 7.5, interaction: { type: 'oral', paperId: '39000' } },
   { id: 'booth', label: 'Talk to Amazon recruiter', position: [20, 1.7, -10], interaction: { type: 'booth' } },
 ]
 
