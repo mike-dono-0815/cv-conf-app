@@ -19,6 +19,9 @@ export function VideoOverlay({ paper, onClose }: Props) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // Ensure pointer lock is released the moment this overlay mounts
+  useEffect(() => { if (document.pointerLockElement) document.exitPointerLock() }, [])
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()

@@ -81,13 +81,24 @@ export function FirstPersonPlayer({
     camera.lookAt(0, 1.7, 0)
   }, [camera])
 
-  // In chat/interaction mode: block canvas clicks so PointerLockControls cannot re-acquire lock
+  // In interaction mode: forcibly release and prevent pointer lock re-acquisition
   useEffect(() => {
     if (!disabled) return
+    // Release immediately
     controls.current?.unlock()
+    if (document.pointerLockElement) document.exitPointerLock()
+    // Re-release any time it gets sneaked back (e.g. click leaking from a closing overlay)
+    const onLockChange = () => { if (document.pointerLockElement) document.exitPointerLock() }
+    document.addEventListener('pointerlockchange', onLockChange)
+    // Block both mousedown and click on the canvas so PointerLockControls never fires
     const block = (e: MouseEvent) => e.stopImmediatePropagation()
+    gl.domElement.addEventListener('mousedown', block, true)
     gl.domElement.addEventListener('click', block, true)
-    return () => gl.domElement.removeEventListener('click', block, true)
+    return () => {
+      document.removeEventListener('pointerlockchange', onLockChange)
+      gl.domElement.removeEventListener('mousedown', block, true)
+      gl.domElement.removeEventListener('click', block, true)
+    }
   }, [disabled, gl.domElement])
 
   useEffect(() => {
