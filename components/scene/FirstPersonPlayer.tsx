@@ -21,6 +21,21 @@ const INTERACTION_RADIUS = 4
 const HALL_X = [-29, 29] as const
 const HALL_Z = [-19, 19] as const
 
+// [centerX, centerZ, halfW, halfD] — object half-extents + 0.4 player clearance radius
+const OBSTACLE_AABBS: [number, number, number, number][] = [
+  [-10,  14,   2.4, 0.9],   // registration desk
+  [-25,  10,   1.9, 0.9],   // catering table (poster hall)
+  [ 27,  12,   1.9, 0.9],   // catering table (industry fair)
+  [ 20, -13,   5.4, 1.05],  // industry fair counter
+]
+
+function hitsObstacle(x: number, z: number): boolean {
+  for (const [cx, cz, hw, hd] of OBSTACLE_AABBS) {
+    if (Math.abs(x - cx) < hw && Math.abs(z - cz) < hd) return true
+  }
+  return false
+}
+
 function getZone(x: number): string {
   if (x < -6) return 'Poster Hall'
   if (x > 8) return 'Industry Fair'
@@ -106,6 +121,7 @@ export function FirstPersonPlayer({
     if (keys.current.d) move.addScaledVector(right, 1)
 
     const prevX = camera.position.x
+    const prevZ = camera.position.z
 
     if (move.length() > 0) {
       move.normalize().multiplyScalar(SPEED * delta)
@@ -125,6 +141,10 @@ export function FirstPersonPlayer({
         }
       }
     }
+
+    // Obstacle AABB collision — axis-separated so the player slides along surfaces
+    if (hitsObstacle(camera.position.x, prevZ)) camera.position.x = prevX
+    if (hitsObstacle(camera.position.x, camera.position.z)) camera.position.z = prevZ
 
     // Zone detection
     const zone = getZone(camera.position.x)
