@@ -97,7 +97,7 @@ export function IndustryFair({ booth }: Props) {
 
       {/* Recruiter + name badge */}
       <Figure position={[20, 0, -14.6]} shirt="#ff9900" pants="#232f3e" skin="#c8a882" />
-      <mesh position={[20, 1.15, -14.0]}>
+      <mesh position={[20, 1.2, -12.7]}>
         <planeGeometry args={[0.9, 0.25]} />
         <meshBasicMaterial map={badgeTex} toneMapped={false} />
       </mesh>
