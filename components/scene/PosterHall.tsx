@@ -1,169 +1,100 @@
 'use client'
 
+// DROP-IN REPLACEMENT for components/scene/PosterHall.tsx
+// Upgrades the easel (two angled front legs + back leg = tripod, white board frame,
+// handout tray) and enriches the poster canvas with a heatmap + bar-chart figure block,
+// two-column body text, and a footer. Boards/frames cast & receive shadows.
+// Keeps the same `papers` prop + buildPosterCanvas signature (logo still loaded from /cvpr-logo.svg).
+
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import type { Paper } from '@/lib/types'
 
-interface Props {
-  papers: Paper[]
-}
+interface Props { papers: Paper[] }
 
-// Board positions: 3 in back row (z=-12), 2 in front row (z=-6)
 const POSITIONS: [number, number, number][] = [
-  [-26, 2, -12],
-  [-20, 2, -12],
-  [-14, 2, -12],
-  [-23, 2, -6],
-  [-17, 2, -6],
+  [-26, 0, -12], [-20, 0, -12], [-14, 0, -12], [-23, 0, -6], [-17, 0, -6],
 ]
 
-const EASEL_COLOR = '#2c3e50'
 const CANVAS_W = 512
-const CANVAS_H = 709  // matches 2.6 : 3.6 aspect ratio
+const CANVAS_H = 720
 
-function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const words = text.split(' ')
-  const lines: string[] = []
-  let current = ''
-  for (const word of words) {
-    const test = current ? `${current} ${word}` : word
-    if (ctx.measureText(test).width > maxWidth && current) {
-      lines.push(current)
-      current = word
-    } else {
-      current = test
-    }
-  }
-  if (current) lines.push(current)
-  return lines
+function wrap(ctx: CanvasRenderingContext2D, text: string, maxW: number): string[] {
+  const words = text.split(' '); const lines: string[] = []; let cur = ''
+  for (const w of words) { const t = cur ? `${cur} ${w}` : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w } else cur = t }
+  if (cur) lines.push(cur); return lines
+}
+
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r)
+  ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath()
 }
 
 function buildPosterCanvas(paper: Paper, logo: HTMLImageElement | null): HTMLCanvasElement {
-  const W = CANVAS_W
-  const H = CANVAS_H
-  const canvas = document.createElement('canvas')
-  canvas.width = W
-  canvas.height = H
+  const W = CANVAS_W, H = CANVAS_H
+  const canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H
   const ctx = canvas.getContext('2d')!
-  const accent = paper.accentColor ?? '#1a2b4a'
+  const accent = paper.accentColor ?? '#2563eb'
 
-  // White background
-  ctx.fillStyle = '#f8f9fa'
-  ctx.fillRect(0, 0, W, H)
-
-  // ── Navy header ──
-  const headerH = 90
-  ctx.fillStyle = '#1a2b4a'
-  ctx.fillRect(0, 0, W, headerH)
-
-  // Right accent stripe
-  ctx.fillStyle = accent
-  ctx.fillRect(W - 14, 0, 14, headerH)
-
-  // CVPR logo (white SVG on navy)
+  ctx.fillStyle = '#fbfaf7'; ctx.fillRect(0, 0, W, H)
+  // header
+  ctx.fillStyle = '#26304a'; ctx.fillRect(0, 0, W, 92)
+  ctx.fillStyle = accent; ctx.fillRect(W - 12, 0, 12, 92)
   if (logo && logo.naturalWidth > 0) {
-    const logoH = 50
-    const logoW = logoH * (logo.naturalWidth / logo.naturalHeight)
-    const clampedW = Math.min(logoW, 210)
-    ctx.drawImage(logo, 14, (headerH - logoH) / 2, clampedW, logoH)
+    const lh = 46, lw = Math.min(lh * (logo.naturalWidth / logo.naturalHeight), 180)
+    ctx.drawImage(logo, 16, (92 - lh) / 2, lw, lh)
   } else {
-    // Text fallback
-    ctx.fillStyle = '#ffffff'
-    ctx.font = 'bold 36px Georgia, serif'
-    ctx.fillText('CVPR', 14, 52)
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 30px Georgia, serif'; ctx.textAlign = 'left'; ctx.fillText('CVPR', 18, 46)
+    ctx.font = '600 16px system-ui'; ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.fillText('2026', 18, 70)
   }
-
-  // Conference details (top-right of header)
-  ctx.fillStyle = 'rgba(255,255,255,0.55)'
-  ctx.font = '9px system-ui, sans-serif'
-  ctx.textAlign = 'right'
-  ctx.fillText('IEEE/CVF Conference on', W - 22, 26)
-  ctx.fillText('Computer Vision and', W - 22, 40)
-  ctx.fillText('Pattern Recognition', W - 22, 54)
-  ctx.fillText('Nashville, TN · June 2026', W - 22, 70)
+  ctx.textAlign = 'right'; ctx.font = '10px system-ui'; ctx.fillStyle = 'rgba(255,255,255,0.6)'
+  ctx.fillText('IEEE/CVF Conference on Computer Vision', W - 22, 34)
+  ctx.fillText('and Pattern Recognition · Nashville, TN', W - 22, 50)
   ctx.textAlign = 'left'
+  let y = 112
 
-  let y = headerH + 10
-
-  // ── Highlight badge ──
   if (paper.highlighted) {
-    ctx.fillStyle = '#f59e0b'
-    ctx.fillRect(0, y, W, 22)
-    ctx.fillStyle = '#000000'
-    ctx.font = 'bold 10px system-ui, sans-serif'
-    ctx.textAlign = 'center'
-    ctx.fillText('★  CVPR 2026 HIGHLIGHT PAPER', W / 2, y + 15)
-    ctx.textAlign = 'left'
-    y += 30
-  } else {
-    y += 6
+    ctx.fillStyle = '#e8a33d'; ctx.fillRect(0, y - 12, W, 24)
+    ctx.fillStyle = '#1a1306'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center'
+    ctx.fillText('★  CVPR 2026 HIGHLIGHT PAPER', W / 2, y + 4); ctx.textAlign = 'left'; y += 26
   }
 
-  // ── Paper title ──
-  ctx.fillStyle = '#0d1117'
-  ctx.font = 'bold 18px system-ui, sans-serif'
-  const titleLines = wrapText(ctx, paper.title, W - 32)
-  const titleLineH = 24
-  titleLines.forEach((line, i) => ctx.fillText(line, 16, y + titleLineH + i * titleLineH))
-  y += titleLineH + titleLines.length * titleLineH + 10
+  ctx.fillStyle = '#15171d'; ctx.font = 'bold 21px system-ui'
+  wrap(ctx, paper.title, W - 36).forEach((l) => { ctx.fillText(l, 18, y + 22); y += 27 })
+  y += 6
+  ctx.strokeStyle = accent; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(18, y); ctx.lineTo(W - 18, y); ctx.stroke(); y += 16
 
-  // ── Accent rule ──
-  ctx.strokeStyle = accent
-  ctx.lineWidth = 3
-  ctx.beginPath()
-  ctx.moveTo(16, y)
-  ctx.lineTo(W - 16, y)
-  ctx.stroke()
-  y += 12
-
-  // ── Authors ──
-  const authStr = paper.authors.length > 4
-    ? paper.authors.slice(0, 4).join(', ') + ' et al.'
-    : paper.authors.join(', ')
-  ctx.fillStyle = '#444444'
-  ctx.font = '12px system-ui, sans-serif'
-  const authLines = wrapText(ctx, authStr, W - 32)
-  authLines.forEach((line, i) => ctx.fillText(line, 16, y + 14 + i * 17))
-  y += 14 + authLines.length * 17 + 12
-
-  // ── Abstract label ──
-  ctx.fillStyle = accent
-  ctx.font = 'bold 10px system-ui, sans-serif'
-  ctx.fillText('A B S T R A C T', 16, y)
+  const authStr = paper.authors.length > 4 ? paper.authors.slice(0, 4).join(', ') + ' et al.' : paper.authors.join(', ')
+  ctx.fillStyle = '#5a5e66'; ctx.font = '13px system-ui'
+  wrap(ctx, authStr, W - 36).forEach((l) => { ctx.fillText(l, 18, y); y += 18 })
   y += 14
 
-  // ── Abstract body ──
-  ctx.fillStyle = '#2a2a2a'
-  ctx.font = '11.5px system-ui, sans-serif'
-  const bottomBarH = 34
-  const absLines = wrapText(ctx, paper.abstract, W - 32)
-  const lineH = 15
-  const availH = H - bottomBarH - 4 - y
-  const maxLines = Math.min(absLines.length, Math.floor(availH / lineH))
+  ctx.fillStyle = accent; ctx.font = 'bold 11px system-ui'; ctx.fillText('A B S T R A C T', 18, y); y += 14
+  ctx.fillStyle = '#3a3d44'; ctx.font = '12px system-ui'
+  wrap(ctx, paper.abstract, W - 36).slice(0, 6).forEach((l) => { ctx.fillText(l, 18, y); y += 16 })
+  y += 8
 
-  absLines.slice(0, maxLines).forEach((line, i) => {
-    ctx.fillText(line, 16, y + lineH + i * lineH)
-  })
-  if (absLines.length > maxLines && maxLines > 0) {
-    // Overwrite last line with truncation indicator
-    ctx.fillStyle = '#f8f9fa'
-    ctx.fillRect(16, y + (maxLines - 1) * lineH + 2, W - 32, lineH + 2)
-    ctx.fillStyle = '#888888'
-    ctx.fillText(absLines[maxLines - 1].slice(0, -3) + '…', 16, y + lineH + (maxLines - 1) * lineH)
+  // figure blocks: heatmap (left) + bar chart (right)
+  const fy = y, halfW = (W - 48) / 2
+  ctx.fillStyle = '#eef0f4'; roundRect(ctx, 18, fy, halfW, 150, 6); ctx.fill()
+  ctx.fillStyle = '#e7eaf0'; roundRect(ctx, 30 + halfW, fy, halfW, 150, 6); ctx.fill()
+  const hs = 14, hx = 30, hy = fy + 12
+  for (let r = 0; r < 8; r++) for (let cc = 0; cc < 14; cc++) {
+    const v = Math.random(); ctx.fillStyle = `rgba(${38 + v * 200},${48 + v * 90},${74 + v * 30},1)`
+    ctx.fillRect(hx + cc * hs, hy + r * hs, hs - 1, hs - 1)
   }
-
-  // ── Bottom accent bar ──
+  const bx = 30 + halfW + 14, bw = halfW - 28
   ctx.fillStyle = accent
-  ctx.fillRect(0, H - bottomBarH, W, bottomBarH)
-  ctx.fillStyle = 'rgba(255,255,255,0.9)'
-  ctx.font = '9.5px system-ui, sans-serif'
-  ctx.textAlign = 'center'
-  const sessionShort = paper.session.split('|')[0].trim()
-  ctx.fillText(sessionShort, W / 2, H - bottomBarH + 14)
-  ctx.font = 'bold 9px system-ui, sans-serif'
-  ctx.fillStyle = 'rgba(255,255,255,0.6)'
-  ctx.fillText(paper.session.split('|').slice(1).join(' | ').trim(), W / 2, H - bottomBarH + 26)
-  ctx.textAlign = 'left'
+  for (let i = 0; i < 5; i++) { const bh = 30 + Math.random() * 90; ctx.fillRect(bx + i * (bw / 5), fy + 140 - bh, bw / 5 - 6, bh) }
+  y = fy + 162
+
+  ctx.fillStyle = '#3a3d44'; ctx.font = '12px system-ui'
+  wrap(ctx, 'Results indicate the proposed approach generalizes to unseen domains with minimal degradation; qualitative comparisons show sharper boundaries and fewer artifacts.', W - 36).slice(0, 3).forEach((l) => { ctx.fillText(l, 18, y); y += 16 })
+
+  // footer
+  ctx.fillStyle = accent; ctx.fillRect(0, H - 30, W, 30)
+  ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.font = '10px system-ui'; ctx.textAlign = 'center'
+  ctx.fillText('Poster Session · ' + paper.session.split('|')[0].trim(), W / 2, H - 11); ctx.textAlign = 'left'
 
   return canvas
 }
@@ -178,57 +109,47 @@ export function PosterHall({ papers }: Props) {
   )
 }
 
+const easelMat = new THREE.MeshStandardMaterial({ color: '#2b3340', roughness: 0.5, metalness: 0.3 })
+const frameMat = new THREE.MeshStandardMaterial({ color: '#dfe3e8', roughness: 0.8, metalness: 0 })
+const trayPaperMat = new THREE.MeshStandardMaterial({ color: '#f3f1ea', roughness: 0.9 })
+
 function PosterBoard({ paper, position }: { paper: Paper; position: [number, number, number] }) {
-  const [x, y, z] = position
+  const [x, , z] = position
   const [posterTex, setPosterTex] = useState<THREE.CanvasTexture | null>(null)
   const texRef = useRef<THREE.CanvasTexture | null>(null)
 
   useEffect(() => {
-    // Generate the poster immediately so boards are never blank
-    const applyCanvas = (logo: HTMLImageElement | null) => {
-      const canvas = buildPosterCanvas(paper, logo)
-      const tex = new THREE.CanvasTexture(canvas)
-      tex.needsUpdate = true
-      texRef.current?.dispose()
-      texRef.current = tex
-      setPosterTex(tex)
+    const apply = (logo: HTMLImageElement | null) => {
+      const tex = new THREE.CanvasTexture(buildPosterCanvas(paper, logo))
+      tex.colorSpace = THREE.SRGBColorSpace; tex.needsUpdate = true
+      texRef.current?.dispose(); texRef.current = tex; setPosterTex(tex)
     }
-
-    applyCanvas(null)
-
-    // Upgrade with the actual logo if it loads with real dimensions
+    apply(null)
     let cancelled = false
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      if (!cancelled && img.naturalWidth > 0) applyCanvas(img)
-    }
+    const img = new Image(); img.crossOrigin = 'anonymous'
+    img.onload = () => { if (!cancelled && img.naturalWidth > 0) apply(img) }
     img.src = '/cvpr-logo.svg'
-
     return () => { cancelled = true }
   }, [paper])
-
   useEffect(() => () => { texRef.current?.dispose() }, [])
 
   return (
     <group position={[x, 0, z]}>
-      {/* Easel leg */}
-      <mesh position={[0, 1, -0.2]} rotation={[-0.1, 0, 0]}>
-        <boxGeometry args={[0.06, 2.2, 0.06]} />
-        <meshStandardMaterial color={EASEL_COLOR} />
+      {/* Tripod easel: two angled front legs + back leg */}
+      <mesh position={[-0.9, 1.6, 0.2]} rotation={[0, 0, -0.06]} castShadow material={easelMat}><cylinderGeometry args={[0.035, 0.045, 3.6, 8]} /></mesh>
+      <mesh position={[0.9, 1.6, 0.2]} rotation={[0, 0, 0.06]} castShadow material={easelMat}><cylinderGeometry args={[0.035, 0.045, 3.6, 8]} /></mesh>
+      <mesh position={[0, 1.6, -0.55]} rotation={[-0.18, 0, 0]} castShadow material={easelMat}><cylinderGeometry args={[0.035, 0.045, 3.6, 8]} /></mesh>
+
+      {/* Board frame + poster surface */}
+      <mesh position={[0, 2.1, 0]} castShadow receiveShadow material={frameMat}><boxGeometry args={[2.9, 3.9, 0.1]} /></mesh>
+      <mesh position={[0, 2.1, 0.052]}>
+        <planeGeometry args={[2.6, 3.6]} />
+        <meshStandardMaterial key={posterTex ? 'tex' : 'plain'} map={posterTex ?? undefined} color="#ffffff" roughness={0.85} metalness={0} />
       </mesh>
 
-      {/* Poster board with canvas texture */}
-      <mesh position={[0, y, 0]}>
-        <boxGeometry args={[2.6, 3.6, 0.06]} />
-        <meshStandardMaterial
-          key={posterTex ? 'poster-tex' : 'poster-plain'}
-          map={posterTex ?? undefined}
-          color="#ffffff"
-          roughness={0.9}
-          metalness={0}
-        />
-      </mesh>
+      {/* Handout tray */}
+      <mesh position={[0, 0.95, 0.45]} castShadow receiveShadow material={easelMat}><boxGeometry args={[1.2, 0.06, 0.3]} /></mesh>
+      <mesh position={[0, 1.0, 0.45]} castShadow material={trayPaperMat}><boxGeometry args={[0.5, 0.05, 0.22]} /></mesh>
     </group>
   )
 }
