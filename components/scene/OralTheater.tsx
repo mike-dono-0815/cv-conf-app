@@ -85,9 +85,9 @@ export function OralTheater({ oral }: Props) {
       {/* Speaker */}
       <Figure position={[1, 0, -14.2]} shirt="#2c3e50" pants="#26304a" skin="#e8c9a0" rotationY={0.02} />
 
-      {/* Raked seating */}
+      {/* Raked seating — back rows highest, front rows at stage level */}
       {SEAT_ROWS.map((z, ri) => {
-        const rise = ri * 0.22
+        const rise = (SEAT_ROWS.length - 1 - ri) * 0.22
         return (
           <group key={z}>
             {SEAT_X.map((x) => (
@@ -97,12 +97,31 @@ export function OralTheater({ oral }: Props) {
                 <mesh position={[0, 0.25, 0]} material={stemMat}><cylinderGeometry args={[0.05, 0.05, 0.5, 8]} /></mesh>
               </group>
             ))}
-            {ri > 0 && (
-              <mesh position={[1, rise / 2, z]} receiveShadow material={riserMat}><boxGeometry args={[11, rise + 0.02, 1.7]} /></mesh>
+            {rise > 0 && (
+              <mesh position={[1, rise / 2, z]} receiveShadow material={riserMat}><boxGeometry args={[9.0, rise + 0.02, 1.7]} /></mesh>
             )}
           </group>
         )
       })}
+
+      {/* Side staircases — step down from back row (highest, z=−4) to front (stage level, z=−12) */}
+      {([-4.5, 6.5] as const).map((sx) => (
+        <group key={sx}>
+          {/* Half-step landing: bridges the aisle (y=0) up to the back-row platform */}
+          <mesh position={[sx, 0.22, -2.5]} receiveShadow material={riserMat}>
+            <boxGeometry args={[1.0, 0.44, 1.0]} />
+          </mesh>
+          {/* One step block per elevated row, matching its rise height */}
+          {SEAT_ROWS.map((z, ri) => {
+            const rise = (SEAT_ROWS.length - 1 - ri) * 0.22
+            return rise > 0 ? (
+              <mesh key={z} position={[sx, rise / 2, z]} receiveShadow material={riserMat}>
+                <boxGeometry args={[1.0, rise, 2.0]} />
+              </mesh>
+            ) : null
+          })}
+        </group>
+      ))}
     </group>
   )
 }

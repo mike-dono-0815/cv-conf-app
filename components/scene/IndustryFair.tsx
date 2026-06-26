@@ -27,7 +27,26 @@ function textTex(opts: { w: number; h: number; bg: string; fg: string; lines: st
 }
 
 export function IndustryFair({ booth }: Props) {
-  const backWallTex = useMemo(() => textTex({ w: 1400, h: 600, bg: AMZ_DARK, fg: AMZ_ORANGE, lines: ['amazon', 'science'], sizes: [150, 44], weights: ['900', '600'] }), [])
+  const backWallTex = useMemo(() => {
+    const W = 1400, H = 600, c = document.createElement('canvas'); c.width = W; c.height = H
+    const ctx = c.getContext('2d')!
+    ctx.fillStyle = AMZ_DARK; ctx.fillRect(0, 0, W, H)
+    ctx.textAlign = 'center'; ctx.fillStyle = AMZ_ORANGE
+    ctx.font = '900 150px system-ui, sans-serif'; ctx.fillText('amazon', W / 2, 185)
+    ctx.font = '600 44px system-ui, sans-serif'; ctx.fillText('science', W / 2, 252)
+    ctx.strokeStyle = 'rgba(255,153,0,0.3)'; ctx.lineWidth = 2
+    ctx.beginPath(); ctx.moveTo(120, 278); ctx.lineTo(W - 120, 278); ctx.stroke()
+    const quote = '"Join us in pioneering solutions to complex challenges that not only delight our customers but also help define the future of technology."'
+    ctx.font = '28px system-ui, sans-serif'
+    const maxW = W - 200; let line = '', y = 328
+    for (const word of quote.split(' ')) {
+      const test = line ? `${line} ${word}` : word
+      if (ctx.measureText(test).width > maxW && line) { ctx.fillText(line, W / 2, y); line = word; y += 46 }
+      else line = test
+    }
+    if (line) ctx.fillText(line, W / 2, y)
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t
+  }, [])
   const hireTex = useMemo(() => textTex({ w: 500, h: 130, bg: AMZ_ORANGE, fg: '#ffffff', lines: ["We're Hiring!"], sizes: [56] }), [])
   const bannerTex = useMemo(() => textTex({ w: 320, h: 440, bg: AMZ_DARK, fg: AMZ_ORANGE, lines: ['Amazon', 'Computer', 'Vision'], sizes: [50, 40, 40], weights: ['bold', '500', '500'] }), [])
   const badgeTex = useMemo(() => textTex({ w: 400, h: 110, bg: '#ffffff', fg: '#111', lines: [`${booth.recruiterName} — Recruiter`], sizes: [34] }), [booth.recruiterName])

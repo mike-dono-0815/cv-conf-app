@@ -97,8 +97,8 @@ export function EnvironmentProps() {
       <Belt x1={-2.6} z1={14} x2={-2.6} z2={10} mats={mats} />
       <Belt x1={2.6} z1={14} x2={2.6} z2={10} mats={mats} />
 
-      {/* Registration desk — south-west lobby */}
-      <group position={[-10, 0, 16]}>
+      {/* Registration desk — aligned with end of zone-separator walls (z=14) */}
+      <group position={[-10, 0, 14]}>
         <mesh position={[0, 0.52, 0]} castShadow receiveShadow material={mats.deskBody}><boxGeometry args={[4, 1.05, 1]} /></mesh>
         <mesh position={[0, 1.06, 0]} material={mats.gold}><boxGeometry args={[4.2, 0.1, 1.2]} /></mesh>
         <mesh position={[0, 2.2, -0.4]}><planeGeometry args={[3.4, 0.8]} /><meshStandardMaterial map={regTex} /></mesh>
