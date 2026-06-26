@@ -23,17 +23,17 @@ const POSITIONS: [number, number, number][] = [
 
 // Two representative figure URLs per paper (loaded via /api/fig proxy to avoid canvas CORS taint)
 const PAPER_FIGURES: Record<string, [string | null, string | null]> = {
-  '36715': ['https://arxiv.org/html/2604.09445v1/x1.png',      'https://arxiv.org/html/2604.09445v1/x2.png'],       // AsymLoc
+  '36715': ['/paper-figs/asymloc-1.png', '/paper-figs/asymloc-2.png'],                                                 // AsymLoc
   '39849': ['https://arxiv.org/html/2511.19661v2/x1.png',      'https://arxiv.org/html/2511.19661v2/x2.png'],       // CodeV
   '36568': ['https://arxiv.org/html/2602.21402v2/x1.png',      'https://arxiv.org/html/2602.21402v2/x2.png'],       // FlowFixer
   '38676': ['https://arxiv.org/html/2602.12640/figures/teaser_v1.png', 'https://arxiv.org/html/2602.12640/figures/framework.png'], // ImageRAGTurbo
   '39033': ['https://arxiv.org/html/2604.01600v1/x1.png',      'https://arxiv.org/html/2604.01600v1/x2.png'],       // MM-ReCoder
   '36512': ['https://arxiv.org/html/2603.25942v1/x1.png',      'https://arxiv.org/html/2603.25942v1/x2.png'],       // Reinforcing CoT
   '38586': ['https://arxiv.org/html/2603.12433v3/x1.png',      'https://arxiv.org/html/2603.12433v3/x2.png'],       // Revisiting Model Stitching
-  '38920': ['https://img.youtube.com/vi/Uqitvyw9WHo/hqdefault.jpg', null],                                           // RMIR (YouTube thumbnail)
+  '38920': ['/paper-figs/rmir-1.png', '/paper-figs/rmir-2.png'],                                                       // RMIR
   '39532': ['https://arxiv.org/html/2602.14432/x1.png',        'https://arxiv.org/html/2602.14432/x2.png'],         // S2D
   '37785': ['https://arxiv.org/html/2606.24094v1/x1.png',      'https://arxiv.org/html/2606.24094v1/x2.png'],       // Universal Clustering
-  '38604': ['https://img.youtube.com/vi/YPrNK54A32c/hqdefault.jpg', null],                                           // Visual Grounding (YouTube thumbnail)
+  '38604': ['/paper-figs/vg-1.png', '/paper-figs/vg-2.png'],                                                           // Visual Grounding
   '41387': ['https://arxiv.org/html/2604.19945v1/x1.png',      'https://arxiv.org/html/2604.19945v1/x2.png'],       // Visual Reasoning RL
   '36294': ['https://arxiv.org/html/2605.20576v1/x1.png',      'https://arxiv.org/html/2605.20576v1/x2.png'],       // δYNAMICS
 }
@@ -184,7 +184,11 @@ function PosterBoard({ paper, position }: { paper: Paper; position: [number, num
     apply(null, null, null) // immediate placeholder while images load
 
     const [rawFig1, rawFig2] = PAPER_FIGURES[paper.id] ?? [null, null]
-    const proxyFig = (url: string | null) => url ? `/api/fig?url=${encodeURIComponent(url)}` : null
+    const proxyFig = (url: string | null) => {
+      if (!url) return null
+      if (url.startsWith('/')) return url
+      return `/api/fig?url=${encodeURIComponent(url)}`
+    }
 
     Promise.all([
       loadImg('/cvpr-logo.svg'),
