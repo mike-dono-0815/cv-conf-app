@@ -116,7 +116,7 @@ function CvprBanner() {
   }, [])
 
   return (
-    <mesh position={[0, 5.4, 19.7]} rotation={[0, Math.PI, 0]}>
+    <mesh position={[0, 5.4, 23.7]} rotation={[0, Math.PI, 0]}>
       <planeGeometry args={[20, 3]} />
       <meshStandardMaterial map={tex ?? undefined} roughness={0.85} />
     </mesh>
@@ -149,30 +149,30 @@ export function HallStructure() {
   return (
     <group>
       {/* Carpet + entrance runner */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow material={mats.floor}>
-        <planeGeometry args={[60, 40]} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 2]} receiveShadow material={mats.floor}>
+        <planeGeometry args={[60, 44]} />
       </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.012, 0]} receiveShadow material={mats.runner}>
-        <planeGeometry args={[5, 38]} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.012, 2]} receiveShadow material={mats.runner}>
+        <planeGeometry args={[5, 42]} />
       </mesh>
 
       {/* Ceiling */}
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 7, 0]} material={mats.ceil}>
-        <planeGeometry args={[60, 40]} />
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 7, 2]} material={mats.ceil}>
+        <planeGeometry args={[60, 44]} />
       </mesh>
 
       {/* Walls */}
-      {([[0, 3.5, -20, 60, 7, 0.4], [0, 3.5, 20, 60, 7, 0.4], [30, 3.5, 0, 0.4, 7, 40], [-30, 3.5, 0, 0.4, 7, 40]] as const).map((w, i) => (
+      {([[0, 3.5, -20, 60, 7, 0.4], [0, 3.5, 24, 60, 7, 0.4], [30, 3.5, 2, 0.4, 7, 44], [-30, 3.5, 2, 0.4, 7, 44]] as const).map((w, i) => (
         <mesh key={i} position={[w[0], w[1], w[2]]} receiveShadow material={mats.wall}>
           <boxGeometry args={[w[3], w[4], w[5]]} />
         </mesh>
       ))}
 
       {/* Baseboards */}
-      {([[0, -19.78, 60, 0.3], [0, 19.78, 60, 0.3]] as const).map(([x, z, w, d], i) => (
+      {([[0, -19.78, 60, 0.3], [0, 23.78, 60, 0.3]] as const).map(([x, z, w, d], i) => (
         <mesh key={`bbz${i}`} position={[x, 0.175, z]} receiveShadow material={mats.base}><boxGeometry args={[w, 0.35, d]} /></mesh>
       ))}
-      {([[-29.78, 0, 0.3, 40], [29.78, 0, 0.3, 40]] as const).map(([x, z, w, d], i) => (
+      {([[-29.78, 2, 0.3, 44], [29.78, 2, 0.3, 44]] as const).map(([x, z, w, d], i) => (
         <mesh key={`bbx${i}`} position={[x, 0.175, z]} receiveShadow material={mats.base}><boxGeometry args={[w, 0.35, d]} /></mesh>
       ))}
 
@@ -181,7 +181,7 @@ export function HallStructure() {
         <mesh key={`tx${z}`} position={[0, 6.78, z]} material={mats.truss}><boxGeometry args={[60, 0.18, 0.18]} /></mesh>
       ))}
       {[-20, -10, 0, 10, 20].map((x) => (
-        <mesh key={`tz${x}`} position={[x, 6.84, 0]} material={mats.truss}><boxGeometry args={[0.18, 0.18, 40]} /></mesh>
+        <mesh key={`tz${x}`} position={[x, 6.84, 2]} material={mats.truss}><boxGeometry args={[0.18, 0.18, 44]} /></mesh>
       ))}
 
       {/* Recessed troffer fixtures */}

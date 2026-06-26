@@ -10,7 +10,7 @@ const BIN_BLUE = '#2456a6'
 // [x, z, scale] — all against walls (±29 / ±19) or in corners
 const PLANT_POSITIONS: [number, number, number][] = [
   // Four corners
-  [-29, 19, 1.0], [29, 19, 1.0], [-29, -19, 1.0], [29, -19, 1.0],
+  [-29, 23, 1.0], [29, 23, 1.0], [-29, -19, 1.0], [29, -19, 1.0],
   // West wall — poster hall
   [-29, 8, 0.9], [-29, -2, 1.0], [-29, -12, 0.95],
   // East wall — industry fair
@@ -18,7 +18,7 @@ const PLANT_POSITIONS: [number, number, number][] = [
   // North wall
   [-21, -19, 0.85], [20, -19, 0.9],
   // South wall / lobby (clear of signs centred at z=16)
-  [-16, 19, 0.85], [22, 19, 0.9],
+  [-16, 23, 0.85], [22, 23, 0.9],
 ]
 
 // [x, z, color] — green recycling + blue trash in pairs.
@@ -44,7 +44,7 @@ const BIN_POSITIONS: [number, number, string][] = [
   // Zone-separator side, industry entrance
   [10.2, 9, BIN_GREEN], [11.0, 9, BIN_BLUE],
   // South lobby — near registration desk, against south wall
-  [-15, 18.5, BIN_GREEN], [-14.2, 18.5, BIN_BLUE],
+  [-15, 22.5, BIN_GREEN], [-14.2, 22.5, BIN_BLUE],
 ]
 
 // [x, z] — against walls or near high-traffic areas

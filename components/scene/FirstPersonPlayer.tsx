@@ -19,7 +19,7 @@ interface Props {
 const SPEED = 8
 const INTERACTION_RADIUS = 4
 const HALL_X = [-29, 29] as const
-const HALL_Z = [-19, 19] as const
+const HALL_Z = [-19, 23] as const
 
 // [centerX, centerZ, halfW, halfD] — object half-extents + 0.4 player clearance radius
 const OBSTACLE_AABBS: [number, number, number, number][] = [
