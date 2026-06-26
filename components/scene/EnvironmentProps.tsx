@@ -1,15 +1,59 @@
 'use client'
 
-// NEW FILE — components/scene/EnvironmentProps.tsx
-// Adds environmental clutter that makes the hall feel inhabited:
-// potted plants, recycle/trash bins, belt stanchions + entrance lane,
-// a registration desk, water coolers, and a catering table with urns.
-// Import + render <EnvironmentProps/> inside <Suspense> in ConferenceScene.
-
 import { useMemo } from 'react'
 import * as THREE from 'three'
 
 const GOLD = '#c9a14a'
+const BIN_GREEN = '#2b6b3f'
+const BIN_BLUE = '#2456a6'
+
+// [x, z, scale] — all against walls (±29 / ±19) or in corners
+const PLANT_POSITIONS: [number, number, number][] = [
+  // Four corners
+  [-29, 19, 1.0], [29, 19, 1.0], [-29, -19, 1.0], [29, -19, 1.0],
+  // West wall — poster hall
+  [-29, 8, 0.9], [-29, -2, 1.0], [-29, -12, 0.95],
+  // East wall — industry fair
+  [29, 8, 0.95], [29, -2, 1.0], [29, -12, 0.9],
+  // North wall
+  [-21, -19, 0.85], [20, -19, 0.9],
+  // South wall / lobby (clear of signs centred at z=16)
+  [-16, 19, 0.85], [22, 19, 0.9],
+]
+
+// [x, z, color] — green recycling + blue trash in pairs.
+// Signs occupy x:−9.75..−4.25, −1.75..3.75, 6.25..11.75 at z≈15–17, so all bin z values
+// are ≤9 or ≥18, and no x values fall inside those ranges at those z bands.
+const BIN_POSITIONS: [number, number, string][] = [
+  // West wall — poster hall, two pairs
+  [-29.2, 6, BIN_GREEN], [-28.4, 6, BIN_BLUE],
+  [-29.2, -8, BIN_GREEN], [-28.4, -8, BIN_BLUE],
+  // West wall — far north pair
+  [-29.2, -16, BIN_GREEN], [-28.4, -16, BIN_BLUE],
+  // East wall — industry fair, two pairs
+  [28.4, 6, BIN_GREEN], [29.2, 6, BIN_BLUE],
+  [28.4, -8, BIN_GREEN], [29.2, -8, BIN_BLUE],
+  // East wall — far north pair
+  [28.4, -16, BIN_GREEN], [29.2, -16, BIN_BLUE],
+  // North wall — poster area
+  [-22, -18.5, BIN_GREEN], [-21.2, -18.5, BIN_BLUE],
+  // North wall — industry area
+  [21, -18.5, BIN_GREEN], [21.8, -18.5, BIN_BLUE],
+  // Zone-separator side, poster entrance (z=9 clears signs at z≈15–17)
+  [-8.5, 9, BIN_GREEN], [-7.7, 9, BIN_BLUE],
+  // Zone-separator side, industry entrance
+  [10.2, 9, BIN_GREEN], [11.0, 9, BIN_BLUE],
+  // South lobby — near registration desk, against south wall
+  [-15, 18.5, BIN_GREEN], [-14.2, 18.5, BIN_BLUE],
+]
+
+// [x, z] — against walls or near high-traffic areas
+const COOLER_POSITIONS: [number, number][] = [
+  [-29.3, 2],   // poster hall, west wall mid
+  [-29.3, -14], // poster hall, west wall north
+  [29.3, 2],    // industry fair, east wall
+  [-12.5, 13],  // lobby, beside registration desk
+]
 
 export function EnvironmentProps() {
   const mats = useMemo(() => ({
@@ -36,14 +80,14 @@ export function EnvironmentProps() {
 
   return (
     <group>
-      {/* Plants */}
-      {([[-29, 18, 1], [29, 18, 1.1], [-7, 18, 0.9], [9, 18, 1], [-29, -17, 1], [29, -17, 1], [-2, -17.5, 0.95]] as const).map(([x, z, s], i) => (
+      {/* Plants — corners + all four walls */}
+      {PLANT_POSITIONS.map(([x, z, s], i) => (
         <Plant key={`pl${i}`} x={x} z={z} s={s} mats={mats} />
       ))}
 
-      {/* Recycle/trash bins */}
-      {([[-6, 16, '#2b6b3f'], [-5.2, 16, '#2456a6'], [10, 16, '#2b6b3f'], [10.8, 16, '#2456a6']] as const).map(([x, z, col], i) => (
-        <Bin key={`bin${i}`} x={x} z={z} color={col} mats={mats} />
+      {/* Bins — green recycling + blue trash in pairs */}
+      {BIN_POSITIONS.map(([x, z, color], i) => (
+        <Bin key={`bin${i}`} x={x} z={z} color={color} mats={mats} />
       ))}
 
       {/* Entrance lane: stanchions + belts */}
@@ -53,27 +97,24 @@ export function EnvironmentProps() {
       <Belt x1={-2.6} z1={14} x2={-2.6} z2={10} mats={mats} />
       <Belt x1={2.6} z1={14} x2={2.6} z2={10} mats={mats} />
 
-      {/* Registration desk */}
+      {/* Registration desk — south-west lobby */}
       <group position={[-10, 0, 16]}>
         <mesh position={[0, 0.52, 0]} castShadow receiveShadow material={mats.deskBody}><boxGeometry args={[4, 1.05, 1]} /></mesh>
         <mesh position={[0, 1.06, 0]} material={mats.gold}><boxGeometry args={[4.2, 0.1, 1.2]} /></mesh>
         <mesh position={[0, 2.2, -0.4]}><planeGeometry args={[3.4, 0.8]} /><meshStandardMaterial map={regTex} /></mesh>
-        {[-1.6, 1.6].map((dx) => <mesh key={dx} position={[dx, 1.65, -0.3]} material={mats.metal}><boxGeometry args={[0.06, 1.2, 0.06]} /></mesh>)}
+        {[-1.6, 1.6].map((dx) => (
+          <mesh key={dx} position={[dx, 1.65, -0.3]} material={mats.metal}><boxGeometry args={[0.06, 1.2, 0.06]} /></mesh>
+        ))}
       </group>
 
       {/* Water coolers */}
-      {([[13, 15], [13.6, 15]] as const).map(([x, z], i) => <Cooler key={`co${i}`} x={x} z={z} mats={mats} />)}
+      {COOLER_POSITIONS.map(([x, z], i) => (
+        <Cooler key={`co${i}`} x={x} z={z} mats={mats} />
+      ))}
 
-      {/* Catering table + urns */}
-      <group position={[24, 0, 14]}>
-        <mesh position={[0, 0.9, 0]} castShadow receiveShadow material={mats.white}><boxGeometry args={[3, 0.06, 1]} /></mesh>
-        {([[-1.4, -0.4], [1.4, -0.4], [-1.4, 0.4], [1.4, 0.4]] as const).map(([dx, dz], i) => (
-          <mesh key={i} position={[dx, 0.45, dz]} castShadow material={mats.metal}><boxGeometry args={[0.08, 0.9, 0.08]} /></mesh>
-        ))}
-        {[-0.8, 0.8].map((dx) => (
-          <mesh key={dx} position={[dx, 1.15, 0]} castShadow material={mats.metal}><cylinderGeometry args={[0.18, 0.2, 0.5, 16]} /></mesh>
-        ))}
-      </group>
+      {/* Catering tables — poster hall break area + industry fair break area */}
+      <CateringTable x={-25} z={10} mats={mats} />
+      <CateringTable x={27} z={12} mats={mats} />
     </group>
   )
 }
@@ -99,7 +140,10 @@ function Plant({ x, z, s, mats }: { x: number; z: number; s: number; mats: any }
 function Bin({ x, z, color, mats }: { x: number; z: number; color: string; mats: any }) {
   return (
     <group position={[x, 0, z]}>
-      <mesh position={[0, 0.4, 0]} castShadow receiveShadow><cylinderGeometry args={[0.26, 0.22, 0.8, 16]} /><meshStandardMaterial color={color} roughness={0.6} metalness={0.2} /></mesh>
+      <mesh position={[0, 0.4, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.26, 0.22, 0.8, 16]} />
+        <meshStandardMaterial color={color} roughness={0.6} metalness={0.2} />
+      </mesh>
       <mesh position={[0, 0.82, 0]} material={mats.binDark}><cylinderGeometry args={[0.28, 0.28, 0.08, 16]} /></mesh>
     </group>
   )
@@ -129,6 +173,20 @@ function Cooler({ x, z, mats }: { x: number; z: number; mats: any }) {
     <group position={[x, 0, z]}>
       <mesh position={[0, 0.5, 0]} castShadow receiveShadow material={mats.coolerBody}><boxGeometry args={[0.45, 1.0, 0.45]} /></mesh>
       <mesh position={[0, 1.25, 0]} material={mats.water}><cylinderGeometry args={[0.2, 0.22, 0.5, 16]} /></mesh>
+    </group>
+  )
+}
+
+function CateringTable({ x, z, mats }: { x: number; z: number; mats: any }) {
+  return (
+    <group position={[x, 0, z]}>
+      <mesh position={[0, 0.9, 0]} castShadow receiveShadow material={mats.white}><boxGeometry args={[3, 0.06, 1]} /></mesh>
+      {([[-1.4, -0.4], [1.4, -0.4], [-1.4, 0.4], [1.4, 0.4]] as const).map(([dx, dz], i) => (
+        <mesh key={i} position={[dx, 0.45, dz]} castShadow material={mats.metal}><boxGeometry args={[0.08, 0.9, 0.08]} /></mesh>
+      ))}
+      {[-0.8, 0.8].map((dx) => (
+        <mesh key={dx} position={[dx, 1.15, 0]} castShadow material={mats.metal}><cylinderGeometry args={[0.18, 0.2, 0.5, 16]} /></mesh>
+      ))}
     </group>
   )
 }
