@@ -105,7 +105,7 @@ export function OralTheater({ oral }: Props) {
       })}
 
       {/* Side staircases — step down from back row (highest, z=−4) to front (stage level, z=−12) */}
-      {([-4.5, 6.5] as const).map((sx) => (
+      {([-4.0, 6.0] as const).map((sx) => (
         <group key={sx}>
           {/* Half-step landing: bridges the aisle (y=0) up to the back-row platform */}
           <mesh position={[sx, 0.22, -2.5]} receiveShadow material={riserMat}>

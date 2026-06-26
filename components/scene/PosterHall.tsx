@@ -13,7 +13,7 @@ import type { Paper } from '@/lib/types'
 interface Props { papers: Paper[] }
 
 const POSITIONS: [number, number, number][] = [
-  [-26, 0, -12], [-20, 0, -12], [-14, 0, -12], [-23, 0, -6], [-17, 0, -6],
+  [-26, 0, -12], [-20, 0, -12], [-14, 0, -12],
 ]
 
 const CANVAS_W = 512
