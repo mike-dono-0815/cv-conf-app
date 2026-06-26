@@ -128,9 +128,9 @@ export function EnvironmentProps() {
       <CateringTable x={-29.3} z={10} rotY={Math.PI / 2} mats={mats} />
       <CateringTable x={27} z={12} mats={mats} />
 
-      {/* Lounge nooks — SW and SE lobby corners */}
-      <SectionalNook position={[-23, 0, 18]} rotationY={-Math.PI / 2} />
-      <SectionalNook position={[23, 0, 18]} rotationY={Math.PI} />
+      {/* Lounge nooks — SW corner (poster zone) and SE corner (industry zone) */}
+      <SectionalNook position={[-26.5, 0, 21]} rotationY={Math.PI / 2} />
+      <SectionalNook position={[26, 0, 21]} rotationY={Math.PI} />
     </group>
   )
 }

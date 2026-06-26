@@ -59,7 +59,10 @@ export function VideoOverlay({ paper, onClose }: Props) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         // slice(1) drops the UI-only opening greeting — Mistral requires conversations to start with a user message
-        body: JSON.stringify({ messages: nextMessages.slice(1), paperId: paper.id }),
+        body: JSON.stringify({
+          messages: nextMessages.slice(1),
+          paper: { title: paper.title, shortTitle: paper.shortTitle, firstAuthor: paper.firstAuthor, authors: paper.authors, abstract: paper.abstract, session: paper.session },
+        }),
       })
 
       if (!res.ok) {

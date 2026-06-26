@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { AMAZON_TALKS } from '@/lib/amazonTalks'
 
 export const runtime = 'edge'
 
-export async function POST(req: NextRequest) {
-  const { messages, paperId } = await req.json()
+interface PaperMeta {
+  title: string
+  shortTitle: string
+  firstAuthor: string
+  authors: string[]
+  abstract: string
+  session: string
+}
 
-  const paper = AMAZON_TALKS.find(t => t.id === paperId) ?? null
-  if (!paper) return NextResponse.json({ error: 'Paper not found' }, { status: 404 })
+export async function POST(req: NextRequest) {
+  const { messages, paper }: { messages: unknown[]; paper: PaperMeta } = await req.json()
+
+  if (!paper?.title) return NextResponse.json({ error: 'Paper not found' }, { status: 404 })
 
   const apiKey = process.env.MISTRAL_API_KEY
   if (!apiKey) return NextResponse.json({ error: 'MISTRAL_API_KEY not set' }, { status: 500 })

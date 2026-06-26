@@ -45,12 +45,12 @@ const OBSTACLE_AABBS: [number, number, number, number][] = [
   [-11,  -8,   1.7, 0.9],
   [  1,  -8,   4.9, 5.25],  // oral theater seating platform (rows z=-4 to -12, width 9 centered at x=1)
   [  1, -15.5, 6.9, 2.4],   // oral theater stage
-  // SW lounge nook (rotated -π/2): main 3-seat sofa + return 2-seat
-  [-24.5, 17.8, 0.65, 1.7],
-  [-23.2, 20.0,  1.3, 0.65],
-  // SE lounge nook (rotated π): main 3-seat sofa + return 2-seat
-  [ 22.8, 19.5,  1.7, 0.65],
-  [ 24.95, 18.2, 1.3, 0.65],
+  // SW lounge nook (π/2, center -26.5,21): main 3-seat + return 2-seat
+  [-28.0, 20.8, 0.65, 1.7],
+  [-26.7, 22.95, 1.3, 0.65],
+  // SE lounge nook (π, center 26,21): main 3-seat + return 2-seat
+  [ 25.8, 22.5,  1.7, 0.65],
+  [ 27.95, 21.2, 0.65, 1.3],
 ]
 
 function hitsObstacle(x: number, z: number): boolean {
