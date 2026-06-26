@@ -49,7 +49,7 @@ export function IndustryFair({ booth }: Props) {
   }, [])
   const hireTex = useMemo(() => textTex({ w: 500, h: 130, bg: AMZ_ORANGE, fg: '#ffffff', lines: ["We're Hiring!"], sizes: [56] }), [])
   const bannerTex = useMemo(() => textTex({ w: 320, h: 440, bg: AMZ_DARK, fg: AMZ_ORANGE, lines: ['Amazon', 'Computer', 'Vision'], sizes: [50, 40, 40], weights: ['bold', '500', '500'] }), [])
-  const badgeTex = useMemo(() => textTex({ w: 400, h: 110, bg: '#ffffff', fg: '#111', lines: [`${booth.recruiterName} — Recruiter`], sizes: [34] }), [booth.recruiterName])
+  const badgeTex = useMemo(() => textTex({ w: 400, h: 110, bg: '#ffffff', fg: '#111', lines: ['Recruiter'], sizes: [34] }), [])
 
   const mats = useMemo(() => ({
     wall: new THREE.MeshStandardMaterial({ map: backWallTex, roughness: 0.7 }),
