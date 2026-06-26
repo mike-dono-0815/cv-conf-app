@@ -29,10 +29,10 @@ Respond as the author would at a real poster session — knowledgeable, enthusia
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'mistral-large-latest',
+      model: 'mistral-small-latest',
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       stream: true,
-      max_tokens: 800,
+      max_tokens: 500,
       temperature: 0.7,
     }),
   })

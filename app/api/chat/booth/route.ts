@@ -37,7 +37,7 @@ Keep responses conversational, 1-3 paragraphs. Be genuinely interested in the ca
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'mistral-large-latest',
+      model: 'mistral-small-latest',
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       stream: true,
       max_tokens: 600,

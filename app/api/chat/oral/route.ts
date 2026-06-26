@@ -29,20 +29,31 @@ Session: ${paper.session}
 
 You just finished your talk at the Amazon @ CVPR 2026 oral session. Now you are taking audience questions. Respond as a confident, thoughtful presenter. Give detailed answers about methodology, experimental design, comparisons with baselines, ablation studies, limitations, and future work. If asked about implementation details not in the abstract, extrapolate what a researcher in computer vision and machine learning would know. Be specific, use technical language appropriate for a CVPR audience. Keep answers to 2-4 paragraphs.`
 
-  const mistralRes = await fetch('https://api.mistral.ai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'mistral-large-latest',
-      messages: [{ role: 'system', content: systemPrompt }, ...messages],
-      stream: true,
-      max_tokens: 900,
-      temperature: 0.7,
-    }),
-  })
+  const abort = new AbortController()
+  const timer = setTimeout(() => abort.abort(), 22_000)
+
+  let mistralRes: Response
+  try {
+    mistralRes = await fetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      signal: abort.signal,
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'mistral-small-latest',
+        messages: [{ role: 'system', content: systemPrompt }, ...messages],
+        stream: true,
+        max_tokens: 500,
+        temperature: 0.7,
+      }),
+    })
+  } catch {
+    clearTimeout(timer)
+    return NextResponse.json({ error: 'upstream_timeout' }, { status: 503 })
+  }
+  clearTimeout(timer)
 
   if (!mistralRes.ok) {
     const err = await mistralRes.text()
