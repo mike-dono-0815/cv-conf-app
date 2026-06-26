@@ -9,7 +9,7 @@
 //  • Added <EnvironmentProps/> (plants, bins, stanchions, registration desk, coolers, catering)
 
 import { Canvas } from '@react-three/fiber'
-import { Suspense, useState, useCallback, useRef } from 'react'
+import { Suspense, useState, useCallback, useRef, useEffect } from 'react'
 import * as THREE from 'three'
 import { FirstPersonPlayer } from './FirstPersonPlayer'
 import { PosterHall } from './PosterHall'
@@ -54,6 +54,11 @@ export default function ConferenceScene() {
     setSelectedTalk(null)
     setRelocking(true)
   }, [])
+
+  // Ensure pointer lock is released (and stays released) while a talk video is showing
+  useEffect(() => {
+    if (selectedTalk) controlsRef.current?.unlock()
+  }, [selectedTalk])
 
   const activePaperId = interaction.type === 'poster' ? interaction.paperId : null
   const activePaper = activePaperId
