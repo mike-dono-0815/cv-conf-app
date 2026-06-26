@@ -20,7 +20,9 @@ import { EnvironmentProps } from './EnvironmentProps'
 import { FloorArrows } from './FloorArrows'
 import { ChatPanel } from '../ui/ChatPanel'
 import { VideoOverlay } from '../ui/VideoOverlay'
-import type { InteractionType, Interactable } from '@/lib/types'
+import { TalkPicker } from '../ui/TalkPicker'
+import type { InteractionType, Interactable, Paper } from '@/lib/types'
+import { AMAZON_TALKS } from '@/lib/amazonTalks'
 import conferenceData from '@/data/conference.json'
 
 const INTERACTABLES: Interactable[] = [
@@ -35,6 +37,7 @@ const INTERACTABLES: Interactable[] = [
 
 export default function ConferenceScene() {
   const [interaction, setInteraction] = useState<InteractionType>({ type: 'none' })
+  const [selectedTalk, setSelectedTalk] = useState<Paper | null>(null)
   const [nearbyLabel, setNearbyLabel] = useState<string | null>(null)
   const [zoneLabel, setZoneLabel] = useState<string>('Entrance')
   const [isLocked, setIsLocked] = useState(false)
@@ -48,13 +51,13 @@ export default function ConferenceScene() {
 
   const closeInteraction = useCallback(() => {
     setInteraction({ type: 'none' })
+    setSelectedTalk(null)
     setRelocking(true)
   }, [])
 
-  const activePaperId =
-    interaction.type === 'poster' || interaction.type === 'oral' ? interaction.paperId : null
+  const activePaperId = interaction.type === 'poster' ? interaction.paperId : null
   const activePaper = activePaperId
-    ? [...conferenceData.posters, conferenceData.oral].find(p => p.id === activePaperId) ?? null
+    ? conferenceData.posters.find(p => p.id === activePaperId) ?? null
     : null
 
   return (
@@ -94,7 +97,7 @@ export default function ConferenceScene() {
           <EnvironmentProps />
           <FloorArrows />
           <PosterHall papers={conferenceData.posters as any} />
-          <OralTheater oral={conferenceData.oral as any} />
+          <OralTheater />
           <IndustryFair booth={conferenceData.booth as any} />
 
           <FirstPersonPlayer
@@ -151,8 +154,11 @@ export default function ConferenceScene() {
         />
       )}
 
-      {interaction.type === 'oral' && activePaper && (
-        <VideoOverlay paper={activePaper as any} onClose={closeInteraction} />
+      {interaction.type === 'oral' && !selectedTalk && (
+        <TalkPicker talks={AMAZON_TALKS} onSelect={setSelectedTalk} onClose={closeInteraction} />
+      )}
+      {interaction.type === 'oral' && selectedTalk && (
+        <VideoOverlay paper={selectedTalk} onClose={() => setSelectedTalk(null)} />
       )}
     </div>
   )

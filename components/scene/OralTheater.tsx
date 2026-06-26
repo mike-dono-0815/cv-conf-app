@@ -9,19 +9,7 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
 import { Figure } from './Figure'
-import type { Paper } from '@/lib/types'
-
-interface Props { oral: Paper }
-
-function wrap(ctx: CanvasRenderingContext2D, text: string, maxW: number): string[] {
-  const words = text.split(' '); const lines: string[] = []; let cur = ''
-  for (const w of words) { const t = cur ? `${cur} ${w}` : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w } else cur = t }
-  if (cur) lines.push(cur); return lines
-}
-function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
-  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r)
-  ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath()
-}
+import { AMAZON_TALKS } from '@/lib/amazonTalks'
 
 const SEAT_ROWS = [-4, -6, -8, -10, -12]
 const SEAT_X = [-4.25, -2.55, -0.85, 0.85, 2.55, 4.25]
@@ -35,23 +23,44 @@ function fabricTexture(hex: string) {
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t
 }
 
-export function OralTheater({ oral }: Props) {
+export function OralTheater() {
   const screenTex = useMemo(() => {
     const W = 1024, H = 600, c = document.createElement('canvas'); c.width = W; c.height = H
     const ctx = c.getContext('2d')!
     const g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#0d1535'); g.addColorStop(1, '#1c2a55')
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); ctx.textAlign = 'center'
-    ctx.fillStyle = '#e8a33d'; ctx.font = 'bold 26px system-ui'; ctx.fillText('★  CVPR 2026 ORAL', W / 2, 80)
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 40px system-ui'
-    wrap(ctx, oral.title, W - 120).forEach((l, i) => ctx.fillText(l, W / 2, 150 + i * 48))
-    ctx.fillStyle = '#9fb4d6'; ctx.font = '24px system-ui'; ctx.fillText(`${oral.authors[0]} et al.`, W / 2, 300)
-    ctx.fillStyle = 'rgba(255,255,255,0.06)'; roundRect(ctx, 90, 340, W - 180, 180, 10); ctx.fill()
-    ctx.fillStyle = '#6f86ad'; ctx.font = '18px system-ui'; ctx.textAlign = 'left'
-    wrap(ctx, oral.abstract, W - 260).slice(0, 3).forEach((t, i) => ctx.fillText('• ' + t, 120, 380 + i * 40))
-    ctx.textAlign = 'center'; ctx.fillStyle = '#c0392b'; ctx.font = '18px system-ui'
-    ctx.fillText('Walk to the front row and press E to attend', W / 2, H - 30)
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H)
+
+    // Header
+    ctx.textAlign = 'center'
+    ctx.fillStyle = '#e8a33d'; ctx.font = 'bold 24px system-ui'
+    ctx.fillText('★  AMAZON @ CVPR 2026 — ORAL SESSION', W / 2, 44)
+    ctx.fillStyle = 'rgba(255,255,255,0.18)'; ctx.fillRect(30, 58, W - 60, 1)
+
+    // Talk list
+    const talkH = (H - 68 - 42) / AMAZON_TALKS.length
+    AMAZON_TALKS.forEach((talk, i) => {
+      const y = 68 + i * talkH
+      ctx.textAlign = 'left'
+      ctx.fillStyle = '#e8a33d'; ctx.font = 'bold 17px system-ui'
+      ctx.fillText(`${i + 1}`, 36, y + talkH * 0.42)
+      const title = talk.shortTitle.length > 46 ? talk.shortTitle.slice(0, 46) + '…' : talk.shortTitle
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 19px system-ui'
+      ctx.fillText(title, 66, y + talkH * 0.4)
+      ctx.fillStyle = '#7a9bc4'; ctx.font = '14px system-ui'
+      ctx.fillText(`${talk.firstAuthor} et al.`, 66, y + talkH * 0.72)
+      if (i < AMAZON_TALKS.length - 1) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 1
+        ctx.beginPath(); ctx.moveTo(30, y + talkH); ctx.lineTo(W - 30, y + talkH); ctx.stroke()
+      }
+    })
+
+    // Footer
+    ctx.fillStyle = 'rgba(255,255,255,0.18)'; ctx.fillRect(30, H - 42, W - 60, 1)
+    ctx.textAlign = 'center'; ctx.fillStyle = '#c0392b'; ctx.font = '17px system-ui'
+    ctx.fillText('Sit in the front row and press E to select a talk', W / 2, H - 16)
+
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t
-  }, [oral])
+  }, [])
 
   const seatFabric = useMemo(() => new THREE.MeshStandardMaterial({ map: fabricTexture('#a33028'), roughness: 0.95 }), [])
   const bezelMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#0a0a12', roughness: 0.4, metalness: 0.3 }), [])
