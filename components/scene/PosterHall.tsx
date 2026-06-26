@@ -102,7 +102,7 @@ function buildPosterCanvas(paper: Paper, logo: HTMLImageElement | null): HTMLCan
 export function PosterHall({ papers }: Props) {
   return (
     <group>
-      {papers.map((paper, i) => (
+      {papers.slice(0, POSITIONS.length).map((paper, i) => (
         <PosterBoard key={paper.id} paper={paper} position={POSITIONS[i]} />
       ))}
     </group>
