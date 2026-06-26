@@ -69,7 +69,7 @@ export default function ConferenceScene() {
     <div className="relative w-full h-full">
       <Canvas
         shadows={{ type: THREE.PCFSoftShadowMap }}
-        camera={{ fov: 72, near: 0.1, far: 220, position: [0, 1.7, 18] }}
+        camera={{ fov: 72, near: 0.1, far: 220, position: [0, 1.7, 22] }}
         gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 0.98 }}
       >
         {/* Warm atmosphere */}

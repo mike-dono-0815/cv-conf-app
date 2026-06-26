@@ -66,7 +66,7 @@ export function FirstPersonPlayer({
   const controls = useRef<any>(null)
 
   useEffect(() => {
-    camera.position.set(0, 1.7, 18)
+    camera.position.set(0, 1.7, 22)
     camera.lookAt(0, 1.7, 0)
   }, [camera])
 
