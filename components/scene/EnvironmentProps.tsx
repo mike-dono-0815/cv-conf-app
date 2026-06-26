@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
 import { Plant, PlantType } from './Plants'
+import { SectionalNook } from './SectionalNook'
 
 const GOLD = '#c9a14a'
 const BIN_GREEN = '#2b6b3f'
@@ -126,6 +127,10 @@ export function EnvironmentProps() {
       {/* Catering tables — poster hall break area + industry fair break area */}
       <CateringTable x={-29.3} z={10} rotY={Math.PI / 2} mats={mats} />
       <CateringTable x={27} z={12} mats={mats} />
+
+      {/* Lounge nooks — SW and SE lobby corners */}
+      <SectionalNook position={[-23, 0, 18]} rotationY={-Math.PI / 2} />
+      <SectionalNook position={[23, 0, 18]} rotationY={Math.PI} />
     </group>
   )
 }

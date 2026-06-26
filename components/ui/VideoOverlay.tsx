@@ -63,7 +63,7 @@ export function VideoOverlay({ paper, onClose }: Props) {
       })
 
       if (!res.ok) {
-        setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }])
+        setMessages(prev => [...prev, { role: 'assistant', content: 'Unfortunately, there is no more time to ask questions in this session — see me at the poster!' }])
         setStreaming(false)
         return
       }
@@ -97,7 +97,7 @@ export function VideoOverlay({ paper, onClose }: Props) {
         }
       }
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error. Please try again.' }])
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Unfortunately, there is no more time to ask questions in this session — see me at the poster!' }])
     }
 
     setStreaming(false)
