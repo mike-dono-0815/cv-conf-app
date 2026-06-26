@@ -176,8 +176,7 @@ function buildFiddleLeafFig(): THREE.Group {
     const t = i / n
     const y = ph + trunkH * 0.4 + t * (trunkH * 0.75)
     const a = i * 2.4
-    const leaf = bladeMesh(rand(0.7, 1.0), rand(0.28, 0.4))
-    leaf.material = mat
+    const leaf = bladeMesh(rand(0.7, 1.0), rand(0.28, 0.4), mat)
     leaf.position.set(Math.cos(a) * 0.12, y, Math.sin(a) * 0.12)
     leaf.rotation.y = a; leaf.rotation.x = -0.9 - rand(0, 0.3); leaf.rotation.z = rand(-0.2, 0.2)
     leaf.scale.set(1.1, 1.1, 1.1); g.add(leaf)
