@@ -159,7 +159,7 @@ export function FirstPersonPlayer({
     // Look-around animation: 45° left → 45° right → center, triggered by '1'
     if (lookAnim.current) {
       const DEG45 = Math.PI / 4
-      const t = Math.min((performance.now() - lookAnim.current.startTime) / 3600, 1)
+      const t = Math.min((performance.now() - lookAnim.current.startTime) / 5400, 1)
       const ease = (x: number) => x * x * (3 - 2 * x)  // smoothstep
       let yawOff: number
       if (t < 0.25) {
