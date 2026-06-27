@@ -79,31 +79,6 @@ export default function Home() {
           'radial-gradient(120% 90% at 50% -10%, #11203a 0%, #0a0f1a 45%, #070a12 100%)',
       }}
     >
-      {/* Perspective floor grid — evokes the 3D hall */}
-      <div
-        className="absolute inset-x-0 bottom-0 h-[46%] overflow-hidden pointer-events-none"
-        style={{
-          WebkitMaskImage: 'linear-gradient(to top, #000 0%, transparent 92%)',
-          maskImage: 'linear-gradient(to top, #000 0%, transparent 92%)',
-        }}
-      >
-        <div
-          className="absolute"
-          style={{
-            left: '-20%',
-            right: '-20%',
-            top: '-30%',
-            bottom: '-12%',
-            backgroundImage:
-              'linear-gradient(rgba(96,140,235,0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(96,140,235,0.30) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-            transform: 'rotateX(74deg)',
-            transformOrigin: '50% 100%',
-            animation: 'tp-drift 7s linear infinite',
-          }}
-        />
-      </div>
-
       {/* Ambient glows: carpet red, Amazon orange, CVPR blue */}
       <div
         className="absolute pointer-events-none"

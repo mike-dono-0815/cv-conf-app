@@ -28,8 +28,3 @@ body {
 canvas {
   display: block;
 }
-
-@keyframes tp-drift {
-  0%   { background-position: 0 0; }
-  100% { background-position: 0 -560px; }
-}
