@@ -81,15 +81,24 @@ export function FirstPersonPlayer({
   const lockedRef = useRef(false)
   const lastZone = useRef('')
   const controls = useRef<any>(null)
+  const lookAnim = useRef<{ startTime: number; baseYaw: number; basePitch: number } | null>(null)
 
   useEffect(() => {
     camera.position.set(0, 1.7, 22)
     camera.lookAt(0, 1.7, 0)
   }, [camera])
 
+  // Block mousemove from reaching PointerLockControls while look animation is playing
+  useEffect(() => {
+    const block = (e: MouseEvent) => { if (lookAnim.current) e.stopImmediatePropagation() }
+    document.addEventListener('mousemove', block, true)
+    return () => document.removeEventListener('mousemove', block, true)
+  }, [])
+
   // In interaction mode: forcibly release and prevent pointer lock re-acquisition
   useEffect(() => {
     if (!disabled) return
+    lookAnim.current = null
     // Release immediately
     controls.current?.unlock()
     if (document.pointerLockElement) document.exitPointerLock()
@@ -123,6 +132,12 @@ export function FirstPersonPlayer({
         e.preventDefault()
         onInteract(nearbyRef.current)
       }
+      if (e.code === 'Digit1' && !disabled && lockedRef.current && !lookAnim.current) {
+        e.preventDefault()
+        const euler = new THREE.Euler()
+        euler.setFromQuaternion(camera.quaternion, 'YXZ')
+        lookAnim.current = { startTime: performance.now(), baseYaw: euler.y, basePitch: euler.x }
+      }
     }
     const up = (e: KeyboardEvent) => {
       if (e.code === 'KeyW') keys.current.w = false
@@ -140,6 +155,25 @@ export function FirstPersonPlayer({
 
   useFrame((_, delta) => {
     if (!lockedRef.current || disabled) return
+
+    // Look-around animation: 45° left → 45° right → center, triggered by '1'
+    if (lookAnim.current) {
+      const DEG45 = Math.PI / 4
+      const t = Math.min((performance.now() - lookAnim.current.startTime) / 2400, 1)
+      const ease = (x: number) => x * x * (3 - 2 * x)  // smoothstep
+      let yawOff: number
+      if (t < 0.25) {
+        yawOff = -DEG45 * ease(t / 0.25)
+      } else if (t < 0.75) {
+        yawOff = DEG45 * (2 * ease((t - 0.25) / 0.5) - 1)
+      } else {
+        yawOff = DEG45 * (1 - ease((t - 0.75) / 0.25))
+      }
+      camera.rotation.order = 'YXZ'
+      camera.rotation.y = lookAnim.current.baseYaw + yawOff
+      camera.rotation.x = lookAnim.current.basePitch
+      if (t >= 1) lookAnim.current = null
+    }
 
     const forward = new THREE.Vector3()
     camera.getWorldDirection(forward)
