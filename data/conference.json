@@ -178,8 +178,8 @@
   },
   "booth": {
     "company": "Amazon",
-    "team": "Amazon Rekognition & Computer Vision",
-    "recruiterName": "Alex Chen",
+    "team": "Amazon Science",
+    "recruiterName": "a recruiter from Amazon Science",
     "logo": "AMAZON",
     "tagline": "Building the future of computer vision at scale",
     "description": "Amazon's computer vision teams power Rekognition (face analysis, object detection, scene understanding), Just Walk Out Technology in Amazon Go stores, Alexa Vision, and fulfillment center automation. We operate at a scale few companies can match — billions of images analyzed daily — and publish extensively at top venues including CVPR, ICCV, and NeurIPS.",

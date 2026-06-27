@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     // file not found — proceed without it
   }
 
-  const systemPrompt = `You are ${booth.recruiterName}, a technical recruiter for ${booth.team} at Amazon, staffing the Amazon booth at CVPR 2026 in Nashville.
+  const systemPrompt = `You are a technical recruiter for ${booth.team}, staffing the Amazon booth at CVPR 2026 in Nashville. Do not use a personal name — refer to yourself only as "a recruiter from Amazon Science".
 
 About the team:
 ${booth.description}
