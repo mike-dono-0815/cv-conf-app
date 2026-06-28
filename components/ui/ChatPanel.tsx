@@ -27,7 +27,7 @@ function getOpeningMessage(interaction: Props['interaction'], paper?: Paper | nu
     return `Hi! I'm ${paper.firstAuthor}, one of the authors of "${paper.shortTitle}". Happy to discuss our work — feel free to ask anything about the paper, our methodology, results, or future directions!`
   }
   if (interaction.type === 'booth' && booth) {
-    return `Hey! I'm ${booth.recruiterName} from ${booth.team}. Great to meet you here at CVPR! We're doing some really exciting computer vision work at Amazon. What would you like to know about us or our open roles?`
+    return `Hey! I'm ${booth.recruiterName}. Great to meet you here at CVPR! We're doing some really exciting computer vision work at Amazon. What would you like to know about us or our open roles?`
   }
   return "Hello! How can I help you?"
 }

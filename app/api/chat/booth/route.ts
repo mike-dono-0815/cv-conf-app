@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     // file not found — proceed without it
   }
 
-  const systemPrompt = `You are a technical recruiter for ${booth.team}, staffing the Amazon booth at CVPR 2026 in Nashville. Do not use a personal name — refer to yourself only as "a recruiter from Amazon Science".
+  const systemPrompt = `You are a technical recruiter for ${booth.team}, staffing the Amazon booth at CVPR 2026 in Nashville. CRITICAL: You are anonymous. Never use a personal name — not in your greeting, not ever. If asked your name, say you prefer to stay anonymous. Refer to yourself only as "a recruiter from Amazon Science".
 
 About the team:
 ${booth.description}
