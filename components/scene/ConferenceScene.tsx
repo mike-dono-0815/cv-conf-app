@@ -12,6 +12,7 @@ import { Canvas } from '@react-three/fiber'
 import { Suspense, useState, useCallback, useRef, useEffect } from 'react'
 import * as THREE from 'three'
 import { FirstPersonPlayer } from './FirstPersonPlayer'
+import { TouchControls } from './TouchControls'
 import { PosterHall } from './PosterHall'
 import { OralTheater } from './OralTheater'
 import { IndustryFair } from './IndustryFair'
@@ -53,11 +54,23 @@ export default function ConferenceScene() {
   const [zoneLabel, setZoneLabel] = useState<string>('Entrance')
   const [isLocked, setIsLocked] = useState(false)
   const [relocking, setRelocking] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [mobileStarted, setMobileStarted] = useState(false)
   const controlsRef = useRef<{ unlock: () => void } | null>(null)
+  const touchMoveRef = useRef({ x: 0, z: 0 })
+  const touchLookRef = useRef({ dx: 0, dy: 0 })
+  const mobileInteractRef = useRef<(() => void) | null>(null)
+
+  useEffect(() => {
+    setIsMobile(window.matchMedia('(pointer: coarse)').matches)
+  }, [])
 
   const openInteraction = useCallback((item: Interactable) => {
     setInteraction(item.interaction)
     controlsRef.current?.unlock()
+    // TouchControls unmounts immediately, so an in-progress joystick drag never fires
+    // its pointerup — clear it here so the player doesn't drift once the panel closes.
+    touchMoveRef.current = { x: 0, z: 0 }
   }, [])
 
   const closeInteraction = useCallback(() => {
@@ -123,12 +136,16 @@ export default function ConferenceScene() {
             onZoneChange={setZoneLabel}
             onLockChange={(locked) => { setIsLocked(locked); if (locked) setRelocking(false) }}
             controlsRef={controlsRef}
-            disabled={interaction.type !== 'none'}
+            disabled={interaction.type !== 'none' || (isMobile && !mobileStarted)}
+            isMobile={isMobile}
+            touchMoveRef={touchMoveRef}
+            touchLookRef={touchLookRef}
+            mobileInteractRef={mobileInteractRef}
           />
         </Suspense>
       </Canvas>
 
-      {!isLocked && interaction.type === 'none' && (
+      {!isMobile && !isLocked && interaction.type === 'none' && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="flex flex-col items-center gap-2 bg-black/60 backdrop-blur-sm px-8 py-5 rounded-2xl border border-white/10">
             <p className="text-white font-semibold text-lg">
@@ -139,13 +156,25 @@ export default function ConferenceScene() {
         </div>
       )}
 
-      {isLocked && (
+      {isMobile && !mobileStarted && interaction.type === 'none' && (
+        <div
+          className="absolute inset-0 flex items-center justify-center bg-black/30"
+          onPointerDown={() => setMobileStarted(true)}
+        >
+          <div className="flex flex-col items-center gap-2 bg-black/60 backdrop-blur-sm px-8 py-5 rounded-2xl border border-white/10 text-center">
+            <p className="text-white font-semibold text-lg">Tap to start</p>
+            <p className="text-slate-400 text-sm">Drag to look around · Joystick to move · Tap the button to interact</p>
+          </div>
+        </div>
+      )}
+
+      {(isLocked || (isMobile && mobileStarted)) && (
         <div className="absolute top-6 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-black/50 backdrop-blur text-white text-sm font-medium border border-white/10 pointer-events-none transition-all">
           {zoneLabel}
         </div>
       )}
 
-      {isLocked && interaction.type === 'none' && (
+      {!isMobile && isLocked && interaction.type === 'none' && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="w-5 h-5 relative">
             <div className="absolute top-1/2 left-0 right-0 h-px bg-white/70 -translate-y-px" />
@@ -154,11 +183,20 @@ export default function ConferenceScene() {
         </div>
       )}
 
-      {isLocked && nearbyLabel && interaction.type === 'none' && (
+      {!isMobile && isLocked && nearbyLabel && interaction.type === 'none' && (
         <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-black/70 backdrop-blur px-5 py-3 rounded-xl border border-white/10 pointer-events-none">
           <kbd className="px-2 py-0.5 rounded bg-white/20 text-white text-xs font-mono font-bold">E</kbd>
           <span className="text-white text-sm">{nearbyLabel}</span>
         </div>
+      )}
+
+      {isMobile && mobileStarted && interaction.type === 'none' && (
+        <TouchControls
+          movementRef={touchMoveRef}
+          lookRef={touchLookRef}
+          nearbyLabel={nearbyLabel}
+          onInteract={() => mobileInteractRef.current?.()}
+        />
       )}
 
       {(interaction.type === 'poster' || interaction.type === 'booth') && (

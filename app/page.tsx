@@ -204,7 +204,7 @@ export default function Home() {
         </div>
 
         {/* Controls */}
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-[18px] text-sm text-slate-400">
+        <div className="mt-10 hidden pointer-fine:flex flex-wrap items-center justify-center gap-[18px] text-sm text-slate-400">
           <div className="flex items-center gap-2">
             <span className="inline-flex gap-1">
               <Kbd>W</Kbd>
@@ -228,6 +228,22 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <Kbd>ESC</Kbd>
             exit
+          </div>
+        </div>
+        <div className="mt-10 hidden pointer-coarse:flex flex-wrap items-center justify-center gap-[18px] text-sm text-slate-400">
+          <div className="flex items-center gap-2">
+            <Kbd>Joystick</Kbd>
+            move
+          </div>
+          <span className="h-4 w-px bg-white/12" />
+          <div className="flex items-center gap-2">
+            <Kbd>Drag</Kbd>
+            look
+          </div>
+          <span className="h-4 w-px bg-white/12" />
+          <div className="flex items-center gap-2">
+            <Kbd>Tap</Kbd>
+            interact
           </div>
         </div>
 

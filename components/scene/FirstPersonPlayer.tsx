@@ -14,9 +14,14 @@ interface Props {
   onLockChange: (locked: boolean) => void
   controlsRef: MutableRefObject<{ unlock: () => void } | null>
   disabled: boolean
+  isMobile: boolean
+  touchMoveRef: MutableRefObject<{ x: number; z: number }>
+  touchLookRef: MutableRefObject<{ dx: number; dy: number }>
+  mobileInteractRef: MutableRefObject<(() => void) | null>
 }
 
 const SPEED = 8
+const LOOK_SENSITIVITY = 0.0035
 const INTERACTION_RADIUS = 4
 const HALL_X = [-29, 29] as const
 const HALL_Z = [-19, 23] as const
@@ -74,6 +79,10 @@ export function FirstPersonPlayer({
   onLockChange,
   controlsRef,
   disabled,
+  isMobile,
+  touchMoveRef,
+  touchLookRef,
+  mobileInteractRef,
 }: Props) {
   const { camera, gl } = useThree()
   const keys = useRef({ w: false, a: false, s: false, d: false })
@@ -123,6 +132,12 @@ export function FirstPersonPlayer({
   })
 
   useEffect(() => {
+    mobileInteractRef.current = () => {
+      if (!disabled && nearbyRef.current) onInteract(nearbyRef.current)
+    }
+  })
+
+  useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.code === 'KeyW') keys.current.w = true
       if (e.code === 'KeyA') keys.current.a = true
@@ -154,7 +169,26 @@ export function FirstPersonPlayer({
   }, [disabled, onInteract])
 
   useFrame((_, delta) => {
-    if (!lockedRef.current || disabled) return
+    if (isMobile) {
+      if (disabled) return
+    } else if (!lockedRef.current || disabled) {
+      return
+    }
+
+    // Touch-drag look: rotate camera by accumulated pointer deltas
+    if (isMobile) {
+      const look = touchLookRef.current
+      if (look.dx !== 0 || look.dy !== 0) {
+        const euler = new THREE.Euler(0, 0, 0, 'YXZ')
+        euler.setFromQuaternion(camera.quaternion)
+        euler.y -= look.dx * LOOK_SENSITIVITY
+        euler.x -= look.dy * LOOK_SENSITIVITY
+        euler.x = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, euler.x))
+        camera.quaternion.setFromEuler(euler)
+        look.dx = 0
+        look.dy = 0
+      }
+    }
 
     // Look-around animation: 45° left → 45° right → center, triggered by '1'
     if (lookAnim.current) {
@@ -184,16 +218,23 @@ export function FirstPersonPlayer({
     right.crossVectors(forward, new THREE.Vector3(0, 1, 0))
 
     const move = new THREE.Vector3()
-    if (keys.current.w) move.addScaledVector(forward, 1)
-    if (keys.current.s) move.addScaledVector(forward, -1)
-    if (keys.current.a) move.addScaledVector(right, -1)
-    if (keys.current.d) move.addScaledVector(right, 1)
+    if (isMobile) {
+      const { x: joyX, z: joyZ } = touchMoveRef.current
+      move.addScaledVector(forward, joyZ)
+      move.addScaledVector(right, joyX)
+    } else {
+      if (keys.current.w) move.addScaledVector(forward, 1)
+      if (keys.current.s) move.addScaledVector(forward, -1)
+      if (keys.current.a) move.addScaledVector(right, -1)
+      if (keys.current.d) move.addScaledVector(right, 1)
+    }
 
     const prevX = camera.position.x
     const prevZ = camera.position.z
 
+    if (move.length() > 1) move.normalize()
     if (move.length() > 0) {
-      move.normalize().multiplyScalar(SPEED * delta)
+      move.multiplyScalar(SPEED * delta)
       camera.position.add(move)
     }
 
@@ -242,6 +283,8 @@ export function FirstPersonPlayer({
       onNearby(closest?.label ?? null)
     }
   })
+
+  if (isMobile) return null
 
   return (
     <PointerLockControls
