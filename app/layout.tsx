@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -16,6 +16,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "CVPR 2026 — Virtual Conference",
   description: "Experience CVPR 2026 in an interactive 3D environment. Explore poster sessions, attend oral talks, and visit the industry fair.",
+};
+
+// Locks page scale to prevent mobile browsers from pinch/double-tap zooming
+// (or auto-zooming on input focus) during touch-drag look controls or chat input.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({

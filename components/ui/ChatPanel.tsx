@@ -144,7 +144,7 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
   }
 
   return (
-    <div className="fixed top-0 left-0 sm:left-auto sm:right-0 h-dvh flex flex-col w-full sm:w-[420px] bg-[#0d1117]/95 backdrop-blur-md sm:border-l border-white/10 shadow-2xl overflow-hidden">
+    <div className="fixed top-0 left-0 sm:left-auto sm:right-0 h-dvh flex flex-col w-full sm:w-[420px] bg-[#0d1117] sm:bg-[#0d1117]/95 sm:backdrop-blur-md sm:border-l border-white/10 shadow-2xl overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 flex-shrink-0">
         <div className="flex items-center gap-3 min-w-0">
