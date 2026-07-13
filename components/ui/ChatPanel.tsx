@@ -144,7 +144,7 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
   }
 
   return (
-    <div className="absolute top-0 left-0 sm:left-auto sm:right-0 h-dvh flex flex-col w-full sm:w-[420px] bg-[#0d1117]/95 backdrop-blur-md sm:border-l border-white/10 shadow-2xl">
+    <div className="fixed top-0 left-0 sm:left-auto sm:right-0 h-dvh flex flex-col w-full sm:w-[420px] bg-[#0d1117]/95 backdrop-blur-md sm:border-l border-white/10 shadow-2xl overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 flex-shrink-0">
         <div className="flex items-center gap-3 min-w-0">
@@ -190,7 +190,7 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
       )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+      <div className="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-4">
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
             {msg.role === 'assistant' && (
@@ -256,7 +256,13 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
             </svg>
           </button>
         </div>
-        <p className="text-center text-slate-700 text-xs mt-2">ESC to exit and return to conference</p>
+        <p className="hidden pointer-fine:block text-center text-slate-700 text-xs mt-2">ESC to exit and return to conference</p>
+        <button
+          onClick={onClose}
+          className="hidden pointer-coarse:block w-full mt-3 py-3 rounded-xl bg-white/10 active:bg-white/15 text-white text-lg font-medium text-center"
+        >
+          End Discussion
+        </button>
       </div>
     </div>
   )
