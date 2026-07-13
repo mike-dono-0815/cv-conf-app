@@ -161,15 +161,15 @@ export default function ConferenceScene() {
           className="absolute inset-0 flex items-center justify-center bg-black/30"
           onPointerDown={() => setMobileStarted(true)}
         >
-          <div className="flex flex-col items-center gap-2 bg-black/60 backdrop-blur-sm px-8 py-5 rounded-2xl border border-white/10 text-center">
-            <p className="text-white font-semibold text-lg">Tap to start</p>
-            <p className="text-slate-400 text-sm">Drag to look around · Joystick to move · Tap the button to interact</p>
+          <div className="flex flex-col items-center gap-3 bg-black/60 backdrop-blur-sm px-8 py-6 rounded-2xl border border-white/10 text-center max-w-sm">
+            <p className="text-white font-semibold text-2xl">Tap to start</p>
+            <p className="text-slate-300 text-lg">Drag to look around · Joystick to move · Tap the button to interact</p>
           </div>
         </div>
       )}
 
       {(isLocked || (isMobile && mobileStarted)) && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-black/50 backdrop-blur text-white text-sm font-medium border border-white/10 pointer-events-none transition-all">
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 px-4 py-1.5 pointer-coarse:px-6 pointer-coarse:py-2.5 rounded-full bg-black/50 backdrop-blur text-white text-sm pointer-coarse:text-xl font-medium border border-white/10 pointer-events-none transition-all">
           {zoneLabel}
         </div>
       )}

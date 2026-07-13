@@ -9,7 +9,7 @@ interface Props {
   onInteract: () => void
 }
 
-const JOYSTICK_RADIUS = 52 // px, max knob travel from center
+const JOYSTICK_RADIUS = 104 // px, max knob travel from center
 
 export function TouchControls({ movementRef, lookRef, nearbyLabel, onInteract }: Props) {
   const baseRef = useRef<HTMLDivElement>(null)
@@ -92,7 +92,7 @@ export function TouchControls({ movementRef, lookRef, nearbyLabel, onInteract }:
       {/* Movement joystick */}
       <div
         ref={baseRef}
-        className="absolute bottom-8 left-8 w-32 h-32 rounded-full bg-white/10 border border-white/25 backdrop-blur-sm touch-none"
+        className="absolute bottom-8 left-8 w-64 h-64 rounded-full bg-white/10 border border-white/25 backdrop-blur-sm touch-none"
         style={{ zIndex: 20 }}
         onPointerDown={handleJoystickDown}
         onPointerMove={handleJoystickMove}
@@ -100,7 +100,7 @@ export function TouchControls({ movementRef, lookRef, nearbyLabel, onInteract }:
         onPointerCancel={endJoystick}
       >
         <div
-          className="absolute w-14 h-14 rounded-full bg-white/40 border border-white/50 pointer-events-none"
+          className="absolute w-28 h-28 rounded-full bg-white/40 border border-white/50 pointer-events-none"
           style={{
             left: '50%',
             top: '50%',
@@ -113,13 +113,13 @@ export function TouchControls({ movementRef, lookRef, nearbyLabel, onInteract }:
       {nearbyLabel && (
         <button
           onClick={onInteract}
-          className="absolute bottom-10 right-8 flex flex-col items-center gap-1"
+          className="absolute bottom-14 right-8 flex flex-col items-center gap-2"
           style={{ zIndex: 20 }}
         >
-          <div className="w-16 h-16 rounded-full bg-white/20 border-2 border-white/50 backdrop-blur-sm flex items-center justify-center text-white text-xs font-bold active:bg-white/30">
+          <div className="w-32 h-32 rounded-full bg-white/20 border-2 border-white/50 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold active:bg-white/30">
             TAP
           </div>
-          <span className="text-white text-xs bg-black/60 px-2 py-0.5 rounded max-w-[160px] text-center">
+          <span className="text-white text-lg font-medium bg-black/60 px-3 py-1 rounded-lg max-w-[240px] text-center">
             {nearbyLabel}
           </span>
         </button>

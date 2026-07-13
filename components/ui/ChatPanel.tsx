@@ -144,20 +144,20 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
   }
 
   return (
-    <div className="absolute inset-y-0 right-0 flex flex-col w-[420px] bg-[#0d1117]/95 backdrop-blur-md border-l border-white/10 shadow-2xl">
+    <div className="absolute inset-0 sm:inset-y-0 sm:left-auto sm:right-0 flex flex-col w-full sm:w-[420px] bg-[#0d1117]/95 backdrop-blur-md sm:border-l border-white/10 shadow-2xl">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 flex-shrink-0">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1a2b4a] to-[#c0392b] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+          <div className="w-10 h-10 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[#1a2b4a] to-[#c0392b] flex items-center justify-center text-white text-base sm:text-sm font-bold flex-shrink-0">
             {personaName[0]}
           </div>
           <div className="min-w-0">
-            <p className="text-white font-semibold text-sm truncate">{personaName}</p>
+            <p className="text-white font-semibold text-base sm:text-sm truncate">{personaName}</p>
             {paper && (
-              <p className="text-slate-500 text-xs truncate">{paper.shortTitle}</p>
+              <p className="text-slate-500 text-sm sm:text-xs truncate">{paper.shortTitle}</p>
             )}
             {booth && (
-              <p className="text-slate-500 text-xs">{booth.team}</p>
+              <p className="text-slate-500 text-sm sm:text-xs">{booth.team}</p>
             )}
           </div>
         </div>
@@ -175,14 +175,14 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
       {/* Paper info strip */}
       {paper && interaction.type === 'poster' && (
         <div className="px-5 py-3 bg-white/5 border-b border-white/5 flex-shrink-0">
-          <p className="text-slate-400 text-xs leading-relaxed line-clamp-2">
+          <p className="text-slate-400 text-sm sm:text-xs leading-relaxed line-clamp-2">
             {paper.authors.slice(0, 4).join(', ')}{paper.authors.length > 4 ? ' et al.' : ''}
           </p>
           <a
             href={paper.pdfUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#c0392b] text-xs hover:underline mt-1 inline-block"
+            className="text-[#c0392b] text-sm sm:text-xs hover:underline mt-1 inline-block"
           >
             View paper →
           </a>
@@ -194,12 +194,12 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
             {msg.role === 'assistant' && (
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#1a2b4a] to-[#c0392b] flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-0.5">
+              <div className="w-8 h-8 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-[#1a2b4a] to-[#c0392b] flex items-center justify-center text-white text-sm sm:text-xs font-bold flex-shrink-0 mt-0.5">
                 {personaName[0]}
               </div>
             )}
             <div
-              className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+              className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-lg sm:text-sm leading-relaxed ${
                 msg.role === 'user'
                   ? 'bg-[#c0392b] text-white rounded-tr-sm'
                   : 'bg-white/8 text-slate-200 rounded-tl-sm'
@@ -235,7 +235,7 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
 
       {/* Input */}
       <div className="px-4 py-4 border-t border-white/10 flex-shrink-0">
-        <div className="flex items-center gap-3 bg-white/5 rounded-xl border border-white/10 px-4 py-2.5">
+        <div className="flex items-center gap-3 bg-white/5 rounded-xl border border-white/10 px-4 py-3 sm:py-2.5">
           <input
             ref={inputRef}
             type="text"
@@ -244,14 +244,14 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
             onKeyDown={onKeyDown}
             disabled={streaming}
             placeholder={streaming ? 'Waiting for response…' : 'Ask a question…'}
-            className="flex-1 bg-transparent text-white text-sm placeholder:text-slate-600 outline-none disabled:opacity-50"
+            className="flex-1 bg-transparent text-white text-lg sm:text-sm placeholder:text-slate-600 outline-none disabled:opacity-50"
           />
           <button
             onClick={sendMessage}
             disabled={!input.trim() || streaming}
-            className="p-1.5 rounded-lg bg-[#c0392b] hover:bg-[#a93226] text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className="p-2 sm:p-1.5 rounded-lg bg-[#c0392b] hover:bg-[#a93226] text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="sm:w-[14px] sm:h-[14px]">
               <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" />
             </svg>
           </button>
