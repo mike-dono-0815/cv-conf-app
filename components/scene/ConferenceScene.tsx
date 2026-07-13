@@ -90,7 +90,7 @@ export default function ConferenceScene() {
     : null
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full touch-pan-x touch-pan-y">
       <Canvas
         shadows={{ type: THREE.PCFSoftShadowMap }}
         camera={{ fov: 72, near: 0.1, far: 220, position: [0, 1.7, 22] }}
@@ -158,12 +158,12 @@ export default function ConferenceScene() {
 
       {isMobile && !mobileStarted && interaction.type === 'none' && (
         <div
-          className="absolute inset-0 flex items-center justify-center bg-black/30"
+          className="absolute inset-0 flex items-center justify-center bg-black/70 px-6 touch-none"
           onPointerDown={() => setMobileStarted(true)}
         >
-          <div className="flex flex-col items-center gap-5 bg-black/60 backdrop-blur-sm px-10 py-8 rounded-2xl border border-white/10 text-center max-w-xl">
+          <div className="flex flex-col items-center gap-6 bg-black/60 backdrop-blur-sm px-8 py-10 rounded-2xl border border-white/10 text-center w-full max-w-md">
             <p className="text-white font-semibold text-5xl">Tap to start</p>
-            <p className="text-slate-300 text-4xl">Drag to look around · Joystick to move · Tap the button to interact</p>
+            <p className="text-slate-300 text-3xl leading-snug">Drag to look around · Joystick to move · Tap the button to interact</p>
           </div>
         </div>
       )}

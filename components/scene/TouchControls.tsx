@@ -113,7 +113,7 @@ export function TouchControls({ movementRef, lookRef, nearbyLabel, onInteract }:
       {nearbyLabel && (
         <button
           onClick={onInteract}
-          className="absolute bottom-14 right-8 flex flex-col items-center gap-3"
+          className="absolute bottom-14 right-8 flex flex-col items-center gap-3 touch-none"
           style={{ zIndex: 20 }}
         >
           <div className="w-64 h-64 rounded-full bg-white/20 border-2 border-white/50 backdrop-blur-sm flex items-center justify-center text-white text-5xl font-bold active:bg-white/30">

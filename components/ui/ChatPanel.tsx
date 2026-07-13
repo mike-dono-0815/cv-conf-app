@@ -146,7 +146,7 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
   return (
     <div className="fixed top-0 left-0 sm:left-auto sm:right-0 h-dvh flex flex-col w-full sm:w-[420px] bg-[#0d1117] sm:bg-[#0d1117]/95 sm:backdrop-blur-md sm:border-l border-white/10 shadow-2xl overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 flex-shrink-0">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 flex-shrink-0 touch-none">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-10 h-10 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[#1a2b4a] to-[#c0392b] flex items-center justify-center text-white text-base sm:text-sm font-bold flex-shrink-0">
             {personaName[0]}
@@ -174,7 +174,7 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
 
       {/* Paper info strip */}
       {paper && interaction.type === 'poster' && (
-        <div className="px-5 py-3 bg-white/5 border-b border-white/5 flex-shrink-0">
+        <div className="px-5 py-3 bg-white/5 border-b border-white/5 flex-shrink-0 touch-none">
           <p className="text-slate-400 text-sm sm:text-xs leading-relaxed line-clamp-2">
             {paper.authors.slice(0, 4).join(', ')}{paper.authors.length > 4 ? ' et al.' : ''}
           </p>
@@ -190,7 +190,7 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
       )}
 
       {/* Messages */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-4">
+      <div className="flex-1 min-h-0 overflow-y-auto touch-pan-y px-5 py-4 space-y-4">
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
             {msg.role === 'assistant' && (
@@ -234,7 +234,7 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
       </div>
 
       {/* Input */}
-      <div className="px-4 py-4 border-t border-white/10 flex-shrink-0">
+      <div className="px-4 py-4 border-t border-white/10 flex-shrink-0 touch-none">
         <div className="flex items-center gap-3 bg-white/5 rounded-xl border border-white/10 px-4 py-3 sm:py-2.5">
           <input
             ref={inputRef}
