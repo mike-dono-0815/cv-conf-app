@@ -9,6 +9,7 @@ interface Props {
   paper?: Paper | null
   booth?: BoothData
   onClose: () => void
+  isMobile: boolean
 }
 
 function getEndpoint(type: string) {
@@ -32,7 +33,11 @@ function getOpeningMessage(interaction: Props['interaction'], paper?: Paper | nu
   return "Hello! How can I help you?"
 }
 
-export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
+export function ChatPanel({ interaction, paper, booth, onClose, isMobile }: Props) {
+  // Mobile/desktop size — driven by the same touch-detection signal as the rest of the
+  // mobile UI (not a CSS width breakpoint, which misfires on wide-viewport touch devices
+  // like a phone in landscape).
+  const m = (mobile: string, desktop: string) => (isMobile ? mobile : desktop)
   const openingMessage = getOpeningMessage(interaction, paper, booth)
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: 'assistant', content: openingMessage }
@@ -144,29 +149,32 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
   }
 
   return (
-    <div className="fixed top-0 left-0 sm:left-auto sm:right-0 h-dvh flex flex-col w-full sm:w-[420px] bg-[#0d1117] sm:bg-[#0d1117]/95 sm:backdrop-blur-md sm:border-l border-white/10 shadow-2xl overflow-hidden">
+    <div className={`fixed top-0 h-dvh flex flex-col shadow-2xl overflow-hidden ${m(
+      'left-0 w-full bg-[#0d1117] border-white/10',
+      'right-0 w-[420px] bg-[#0d1117]/95 backdrop-blur-md border-l border-white/10'
+    )}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 flex-shrink-0 touch-none">
+      <div className={`flex items-center justify-between border-b border-white/10 flex-shrink-0 touch-none ${m('px-6 py-6', 'px-5 py-4')}`}>
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[#1a2b4a] to-[#c0392b] flex items-center justify-center text-white text-base sm:text-sm font-bold flex-shrink-0">
+          <div className={`rounded-full bg-gradient-to-br from-[#1a2b4a] to-[#c0392b] flex items-center justify-center text-white font-bold flex-shrink-0 ${m('w-16 h-16 text-[40px]', 'w-9 h-9 text-sm')}`}>
             {personaName[0]}
           </div>
           <div className="min-w-0">
-            <p className="text-white font-semibold text-base sm:text-sm truncate">{personaName}</p>
+            <p className={`text-white font-semibold truncate ${m('text-[40px]', 'text-sm')}`}>{personaName}</p>
             {paper && (
-              <p className="text-slate-500 text-sm sm:text-xs truncate">{paper.shortTitle}</p>
+              <p className={`text-slate-500 truncate ${m('text-[35px]', 'text-xs')}`}>{paper.shortTitle}</p>
             )}
             {booth && (
-              <p className="text-slate-500 text-sm sm:text-xs">{booth.team}</p>
+              <p className={`text-slate-500 ${m('text-[35px]', 'text-xs')}`}>{booth.team}</p>
             )}
           </div>
         </div>
         <button
           onClick={onClose}
-          className="p-2 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors flex-shrink-0"
+          className={`rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors flex-shrink-0 ${m('p-3', 'p-2')}`}
           title="Close (ESC)"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width={isMobile ? 28 : 16} height={isMobile ? 28 : 16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </button>
@@ -174,15 +182,15 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
 
       {/* Paper info strip */}
       {paper && interaction.type === 'poster' && (
-        <div className="px-5 py-3 bg-white/5 border-b border-white/5 flex-shrink-0 touch-none">
-          <p className="text-slate-400 text-sm sm:text-xs leading-relaxed line-clamp-2">
+        <div className={`bg-white/5 border-b border-white/5 flex-shrink-0 touch-none ${m('px-6 py-5', 'px-5 py-3')}`}>
+          <p className={`text-slate-400 leading-relaxed line-clamp-2 ${m('text-[35px]', 'text-xs')}`}>
             {paper.authors.slice(0, 4).join(', ')}{paper.authors.length > 4 ? ' et al.' : ''}
           </p>
           <a
             href={paper.pdfUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#c0392b] text-sm sm:text-xs hover:underline mt-1 inline-block"
+            className={`text-[#c0392b] hover:underline mt-1 inline-block ${m('text-[35px]', 'text-xs')}`}
           >
             View paper →
           </a>
@@ -190,16 +198,16 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
       )}
 
       {/* Messages */}
-      <div className="flex-1 min-h-0 overflow-y-auto touch-pan-y px-5 py-4 space-y-4">
+      <div className={`flex-1 min-h-0 overflow-y-auto touch-pan-y space-y-4 ${m('px-6 py-6', 'px-5 py-4')}`}>
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
             {msg.role === 'assistant' && (
-              <div className="w-8 h-8 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-[#1a2b4a] to-[#c0392b] flex items-center justify-center text-white text-sm sm:text-xs font-bold flex-shrink-0 mt-0.5">
+              <div className={`rounded-full bg-gradient-to-br from-[#1a2b4a] to-[#c0392b] flex items-center justify-center text-white font-bold flex-shrink-0 mt-0.5 ${m('w-14 h-14 text-[35px]', 'w-7 h-7 text-xs')}`}>
                 {personaName[0]}
               </div>
             )}
             <div
-              className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-lg sm:text-sm leading-relaxed ${
+              className={`max-w-[85%] px-4 py-2.5 rounded-2xl leading-relaxed ${m('text-[45px]', 'text-sm')} ${
                 msg.role === 'user'
                   ? 'bg-[#c0392b] text-white rounded-tr-sm'
                   : 'bg-white/8 text-slate-200 rounded-tl-sm'
@@ -212,7 +220,7 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
                     p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
                     strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
                     em: ({ children }) => <em className="italic">{children}</em>,
-                    code: ({ children }) => <code className="bg-white/10 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
+                    code: ({ children }) => <code className={`bg-white/10 px-1 py-0.5 rounded font-mono ${m('text-[30px]', 'text-xs')}`}>{children}</code>,
                     ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-0.5">{children}</ul>,
                     ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-0.5">{children}</ol>,
                     li: ({ children }) => <li>{children}</li>,
@@ -234,8 +242,8 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
       </div>
 
       {/* Input */}
-      <div className="px-4 py-4 border-t border-white/10 flex-shrink-0 touch-none">
-        <div className="flex items-center gap-3 bg-white/5 rounded-xl border border-white/10 px-4 py-3 sm:py-2.5">
+      <div className={`border-t border-white/10 flex-shrink-0 touch-none ${m('px-6 py-6', 'px-4 py-4')}`}>
+        <div className={`flex items-center gap-3 bg-white/5 rounded-xl border border-white/10 ${m('px-6 py-5', 'px-4 py-2.5')}`}>
           <input
             ref={inputRef}
             type="text"
@@ -244,14 +252,14 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
             onKeyDown={onKeyDown}
             disabled={streaming}
             placeholder={streaming ? 'Waiting for response…' : 'Ask a question…'}
-            className="flex-1 bg-transparent text-white text-lg sm:text-sm placeholder:text-slate-600 outline-none disabled:opacity-50"
+            className={`flex-1 bg-transparent text-white placeholder:text-slate-600 outline-none disabled:opacity-50 ${m('text-[45px]', 'text-sm')}`}
           />
           <button
             onClick={sendMessage}
             disabled={!input.trim() || streaming}
-            className="p-2 sm:p-1.5 rounded-lg bg-[#c0392b] hover:bg-[#a93226] text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className={`rounded-lg bg-[#c0392b] hover:bg-[#a93226] text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${m('p-4', 'p-1.5')}`}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="sm:w-[14px] sm:h-[14px]">
+            <svg width={isMobile ? 32 : 14} height={isMobile ? 32 : 14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" />
             </svg>
           </button>
@@ -259,7 +267,7 @@ export function ChatPanel({ interaction, paper, booth, onClose }: Props) {
         <p className="hidden pointer-fine:block text-center text-slate-700 text-xs mt-2">ESC to exit and return to conference</p>
         <button
           onClick={onClose}
-          className="hidden pointer-coarse:block w-full mt-3 py-3 rounded-xl bg-white/10 active:bg-white/15 text-white text-lg font-medium text-center"
+          className={`hidden pointer-coarse:block w-full mt-3 rounded-xl bg-white/10 active:bg-white/15 text-white font-medium text-center ${m('text-[45px] py-5', 'text-lg py-3')}`}
         >
           End Discussion
         </button>

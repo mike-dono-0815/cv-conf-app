@@ -205,6 +205,7 @@ export default function ConferenceScene() {
           paper={activePaper as any}
           booth={interaction.type === 'booth' ? (conferenceData.booth as any) : undefined}
           onClose={closeInteraction}
+          isMobile={isMobile}
         />
       )}
 
