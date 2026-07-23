@@ -1,0 +1,12 @@
+/* ============================================================
+   Title Page — additions for app/globals.css
+   Append the @keyframes block below to the END of your existing
+   app/globals.css. It powers the subtle perspective-grid drift
+   on the title page. (The badge dot uses Tailwind's built-in
+   `animate-pulse`, so no extra CSS is needed for that.)
+   ============================================================ */
+
+@keyframes tp-drift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 -560px; }
+}
