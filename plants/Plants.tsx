@@ -59,7 +59,7 @@ function potSquare(g: THREE.Group, w: number, h: number, mat: THREE.Material): n
 }
 
 // arched pointed-ellipse leaf blade
-function bladeMesh(len: number, wid: number, mat: THREE.Material): THREE.Mesh {
+function bladeMesh(len: number, wid: number, mat: THREE.Material = leafMat('#3d6b34')): THREE.Mesh {
   const shape = new THREE.Shape()
   shape.moveTo(0, 0)
   shape.quadraticCurveTo(wid, len * 0.35, 0, len)
